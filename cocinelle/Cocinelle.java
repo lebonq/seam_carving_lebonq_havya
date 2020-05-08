@@ -3,11 +3,11 @@ public class Cocinelle{
     static int[][]calculerM(final int[][] pM){ 
         int vCMax = pM[0].length;//TO-DO
         int vLMax = pM.length;//TO-DO
-        int[][] M = new int[vLMax][vCMax];
+        int[][] M = new int[vLMax][vCMax];//Terme genrale du tableau m(L,C)
 
-        for(int i = 0; i < vLMax;i++){ //
+        for(int i = 0; i < vLMax;i++){
             for(int j = 0; j < vCMax;j++){
-                M[i][j] = pM[i][j];
+                M[i][j] = pM[i][j]; //On copie notre grille des pucerons dans notre 
             }
         }
 
@@ -23,7 +23,6 @@ public class Cocinelle{
                 try{
                     vVn = M[l][c] + pM[l+1][c];
                     vVOldn = M[l+1][c];
-
                 }
                 catch(Exception pE){ }
 
@@ -87,7 +86,7 @@ public class Cocinelle{
     }//Methode accm(M,l,c) 
 
     static public void main(String[] args){
-        int[][] grillePucerons = new int[][]{
+        int[][] grillePucerons = new int[][]{ //Déclaration du tableau
             {2 ,4 ,3 ,9 ,6 },
             {1 ,10,15,1 ,2 },
             {2 ,4 ,11,26,66},
