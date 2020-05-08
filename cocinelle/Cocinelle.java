@@ -24,13 +24,13 @@ public class Cocinelle{
         
     static void accm(int[][] M, int l, int c){
         if(l==0 && c==0) return;
-        int Me = I, Mn = I, Mne = I;
-        if ((c-1>=0)) Me=M[l][c-1] + e(l,c-1);
-        if ((l-1>=0)) Me=M[l-1][c] + n(l-1,c);
-        if ((l-1>=0 && c-1>=0)) Mne=M[l-1][c-1] + ne(l-1,c-1);
-        if(M[l][c] == Me){ 
-            accm(M,l,c-1);
-            System.out.printf("(%d,%d)-->",l,c-1);
+        int Mnw = 0, Mn = 0, Mne = 0; //Si on sort du tableau on en rajoute rien
+        if ((c-1>=0)) Mnw=M[l+1][c-1];
+        if ((l-1>=0)) Mn=M[l+1][c];
+        if ((l-1>=0 && c-1>=0)) Mne=M[l+1][c+1];
+        if(M[l][c] == Mnw){ 
+            accm(M,l+1,c-1);
+            System.out.printf("(%d,%d)-->",l+1,c-1);
         }//endif
         else
             if (M[l][c] == Mn){ 
