@@ -1,46 +1,110 @@
-import java.math.*;
-
 public class Cocinelle{
     
-    static int[][]calculerM(){ 
-    int[][] M = new int[L+1][C+1];
-    M[0][0] = 0;
-    for (int c=1; c < C+1; c++) M[0][c] = M[0][c-1] + e(0,c-1);
-    for (int l=1; l < L+1; l++) M[l][0] = M[l-1][0] + m(l-1,0);
-    
-    for (int l = 1; l < L+1; l++)
-        for (int c = 1; c < C+l; c++){ // calcul du coût min pour arriver en (l, c)
-            int Me = M[l][c-1] + e(l,c-1);
-            // coût min si le dernier déplacement est Est
-            int Mn = M[l-1][c] + n(l-1,c);
-            // coût min si le dernier déplacement est Nord
-            int Mne = M[l-1][c-1] + ne(l-1,c-1); // coût min si le dernier déplacement est Nord—Est
-            M[l][c] = (int)Math.min(Me, (int)Math.min(Mn,Mne));
-        }//endfor
-    return M;
+    static int[][]calculerM(final int[][] pM){ 
+        int vCMax = pM[0].length;//TO-DO
+        int vLMax = pM.length;//TO-DO
+        int[][] M = new int[vLMax][vCMax];
+
+        for(int i = 0; i < vLMax;i++){ //
+            for(int j = 0; j < vCMax;j++){
+                M[i][j] = pM[i][j];
+            }
+        }
+
+        for(int l = 0; l < vLMax;l++){
+            for(int c = 0; c < vCMax;c++){
+                int vVn = 0;
+                int vVOldn = 0;
+                int vVne = 0;
+                int vVOldne = 0;
+                int vVnw = 0;
+                int vVOldnw = 0;
+
+                try{
+                    vVn = M[l][c] + pM[l+1][c];
+                    vVOldn = M[l+1][c];
+
+                }
+                catch(Exception pE){ }
+
+                try{
+                    vVne = M[l][c] + pM[l+1][c+1];
+                    vVOldne = M[l+1][c+1];
+                }
+                catch(Exception pE){ }
+
+                try{
+                    vVnw = M[l][c] + pM[l+1][c-1];
+                    vVOldnw = M[l+1][c-1];
+                }
+                catch(Exception pE){ }
+
+                //if(Math.max(vVn, vVne) < vVnw){
+                    if(vVnw > vVOldnw){
+                        M[l+1][c-1] = vVnw;
+                    }
+                //}
+                //if( vVn < vVne){
+                    if(vVne > vVOldne){
+                        M[l+1][c+1] = vVne;
+                    }
+                //}
+                //else{
+                    if(vVn > vVOldn){
+                        M[l+1][c] = vVn;
+                    }
+                //}
+            }
+        }
+        return M;
+
     }// int[][]calculerM()
 
-    static void afficherCheminCoutMin( int[][]M) { accm(M,L,C);}
-        
-    static void accm(int[][] M, int l, int c){
-        if(l==0 && c==0) return;
-        int Mnw = 0, Mn = 0, Mne = 0; //Si on sort du tableau on en rajoute rien
-        if ((c-1>=0)) Mnw=M[l+1][c-1];
-        if ((l-1>=0)) Mn=M[l+1][c];
-        if ((l-1>=0 && c-1>=0)) Mne=M[l+1][c+1];
-        if(M[l][c] == Mnw){ 
-            accm(M,l+1,c-1);
-            System.out.printf("(%d,%d)-->",l+1,c-1);
-        }//endif
-        else
-            if (M[l][c] == Mn){ 
-                accm(M, l-1, c);
-                System.out.printf("(%d,%d) -->", l-1,c);
-            }//endif
-            else {
-                accm(M, l-1, c-1);
-                System.out.printf("(&d,%d)", l-1,c-1);
+    static void afficherCheminCoutMax(final int[][]M,final int L) { accm(M,L,0);}
+
+    static void accm(final int[][] pM,final int pL,final int pC){
+        if(pL == 0 && pC == 0)
+            return;
+        int Mnw = 0, Mn = 0, Mne = 0; // Si on sort du tableau on en rajoute rien
+        if ((pC - 1 >= 0))
+            Mnw = pM[pL + 1][pC - 1];
+        if ((pL - 1 >= 0))
+            Mn = pM[pL + 1][pC];
+        if ((pL - 1 >= 0 && pC - 1 >= 0))
+            Mne = pM[pL + 1][pC + 1];
+        if (pM[pL][pC] == Mnw) {
+            accm(pM, pL + 1, pC - 1);
+            System.out.printf("(%d,%d)-->", pL + 1, pC - 1);
+        } // endif
+        else if (pM[pL][pC] == Mn) {
+            accm(pM, pL + 1, pC);
+            System.out.printf("(%d,%d) -->", pL + 1, pC);
+        } // endif
+        else {
+            accm(pM, pL + 1, pC + 1);
+            System.out.printf("(&d,%d)", pL + 1, pC + 1);
             }//endelse
-    }//Methode accm(M,l,c)
+    }//Methode accm(M,l,c) 
+
+    static public void main(String[] args){
+        int[][] grillePucerons = new int[][]{
+            {2 ,4 ,3 ,9 ,6 },
+            {1 ,10,15,1 ,2 },
+            {2 ,4 ,11,26,66},
+            {36,34,1 ,13,30},
+            {46,2 ,8 ,7 ,15},
+            {89,27,10,12,3 },
+            {1 ,72,3 ,6 ,6 },
+            {3 ,1 ,2 ,4 ,5 }};
+            int[][] m = calculerM(grillePucerons);
+
+            for(int i = 7; i >= 0;i--){
+                for(int j = 0; j < 5;j++){
+                    System.out.print(""  + m[i][j] + " ");
+                }
+                System.out.println(" ");
+            }
+
+    }
 }//Class cocinelle
 //Je vais me prendre un cafe
