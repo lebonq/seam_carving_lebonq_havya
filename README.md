@@ -1,2 +1,2 @@
 # projet_algo
-Pour un 20/20 assure.
+Pour un 20/20, qui assure.
