@@ -32,6 +32,7 @@ public class SeamCarving {
         int vImageHeight = pImage[0].length;
         BufferedImage vImage = new BufferedImage(vImageWidth,vImageHeight,TYPE_INT_RGB);
         Color vBlack = new Color(0,0,0);
+        Color vGrey = new Color(127,127,127);
         Color vWhite = new Color(255,255,255);
 
 
@@ -42,7 +43,8 @@ public class SeamCarving {
         }
 
         int vNextPixel = 1;
-        int vThreshold = 2;
+        int vThresholdMin = 2;
+        int vThresholdMax = 3;
         double vCurrent = 0;
         double vTop = 0;
         double vBot = 0;
@@ -65,17 +67,25 @@ public class SeamCarving {
                 vRight = (pImage[i][j+vNextPixel][0] + pImage[i][j+vNextPixel][1] + pImage[i][j+vNextPixel][2])/3;}
                 catch(Exception pE){}
 
-                if(Math.abs(vCurrent - vLeft) <= vThreshold || Math.abs(vCurrent- vRight) <= vThreshold){
+                if(Math.abs(vCurrent - vLeft) <= vThresholdMin || Math.abs(vCurrent- vRight) <= vThresholdMin){
                     vImage.setRGB(i, j, vWhite.getRGB());
                 }
-                if(Math.abs(vCurrent - vTop) <= vThreshold || Math.abs(vCurrent- vBot) <= vThreshold){
+                else if ((Math.abs(vCurrent - vLeft) <= vThresholdMax && Math.abs(vCurrent - vLeft) > vThresholdMin) 
+                || (Math.abs(vCurrent - vRight) <= vThresholdMax && Math.abs(vCurrent - vRight) > vThresholdMin)){
+                    vImage.setRGB(i, j, vGrey.getRGB());
+                }
+                if(Math.abs(vCurrent - vTop) <= vThresholdMin || Math.abs(vCurrent- vBot) <= vThresholdMin){
                     vImage.setRGB(i, j, vWhite.getRGB());
+                }
+                else if ((Math.abs(vCurrent - vTop) <= vThresholdMax && Math.abs(vCurrent - vTop) > vThresholdMin) 
+                || (Math.abs(vCurrent - vBot) <= vThresholdMax && Math.abs(vCurrent - vBot) > vThresholdMin)){
+                    vImage.setRGB(i, j, vGrey.getRGB());
                 }
             }
         }
 
 
-        File vOutputfile = new File("black.jpg");
+        File vOutputfile = new File("edge.jpg");
         ImageIO.write(vImage, "jpg", vOutputfile);
     }
 
