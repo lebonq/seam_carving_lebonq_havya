@@ -100,8 +100,8 @@ public class SeamCarving {
     static public void main(final String[] args){
         try{
             long vStart = new Date().getTime();
-            createFile(createImageTab("src/seamcarvingdemo.jpg"));
-            detectEdge(createImageTab("src/seamcarvingdemo.jpg"));
+            createFile(createImageTab("src/8k.jpg"));
+            detectEdge(createImageTab("src/8k.jpg"));
             long vEnd = new Date().getTime();
             long vTime = (vEnd - vStart);
             System.out.println("Temps d'excecution : " + vTime + " millisecondes.");
