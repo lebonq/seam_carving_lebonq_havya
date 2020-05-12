@@ -2,6 +2,7 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import java.io.File;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 
@@ -23,7 +24,6 @@ public class SeamCarving {
                 vImageTab[i][j][2] = new Color(vImage.getRGB(i, j)).getBlue();
             }
         }
-        System.out.print(vImageTab);
         return vImageTab;
     }
 
@@ -99,8 +99,12 @@ public class SeamCarving {
 
     static public void main(final String[] args){
         try{
+            long vStart = new Date().getTime();
             createFile(createImageTab("src/seamcarvingdemo.jpg"));
             detectEdge(createImageTab("src/seamcarvingdemo.jpg"));
+            long vEnd = new Date().getTime();
+            long vTime = (vEnd - vStart);
+            System.out.println("Temps d'excecution : " + vTime + " millisecondes.");
         }
         catch(Exception pE){
             System.err.println(pE);
