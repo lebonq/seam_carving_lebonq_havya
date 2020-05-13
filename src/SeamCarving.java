@@ -36,7 +36,7 @@ public class SeamCarving {
         Color vGrey = new Color(127,127,127);
         Color vWhite = new Color(255,255,255);
         int[][] vImageTab = new int[vImageWidth][vImageHeight];
-        for(int w = 17; w <18; w++){
+        for(int w = 14; w <15; w++){
         
         for (int i = 0; i < vImageWidth; i++) {
             for (int j = 0; j < vImageHeight; j++) {
@@ -132,74 +132,31 @@ public class SeamCarving {
         return vImageTab;
     }
 
-    static int[][]calculerM(final int[][] pEdge){ 
+    static int[][]calculerM(final int[][] pEdge) throws Exception{ 
         int vImageWidth = pEdge.length;
         int vImageHeight = pEdge[0].length;
+        int vInfini = Integer.MAX_VALUE;
         int[][] vM = new int[vImageWidth][vImageHeight];
         Color vBlack = new Color(0,0,0); //vaut 3
         Color vGrey = new Color(127,127,127); //vaut 2
         Color vWhite = new Color(255,255,255); //vaut 1
 
         for(int i = 0; i < vImageWidth;i++){
-            for(int j = 0; j < 3;j++){
+            for(int j = 0; j < vImageHeight;j++){
                 if(new Color(pEdge[i][j]).getRed() == vBlack.getRed()) vM[i][j] = 3;
                 if(new Color(pEdge[i][j]).getRed() == vGrey.getRed()) vM[i][j] = 2;
                 if(new Color(pEdge[i][j]).getRed() == vWhite.getRed()) vM[i][j] = 1;
+                int vSW = vM[i-1][j+1];
+                int vS = vM[i][j+1];
+                int vSE = vM[i][j+1];
+                vM[i][j] =  (int)Math.min(vSW, (int)Math.min(vS,vSE));
+
             }//endfor
         }//endfor
         
-        for(int i = 0; i < vImageWidth;i++){
-            for(int j = 0; j < vImageHeight;j++){
-                int vVs = 1;
-                int vVOlds = 1;
-                int vVse = 1;
-                int vVOldse = 1;
-                int vVsw = 1;
-                int vVOldsw = 1;
-
-                try{
-                    int vNext = 0;
-                    if(new Color(pEdge[i][j+1]).getRed() == vBlack.getRed()) vNext = 3;
-                    if(new Color(pEdge[i][j+1]).getRed()  == vGrey.getRed()) vNext = 2;
-                    if(new Color(pEdge[i][j+1]).getRed()  == vWhite.getRed()) vNext = 1;
-                    vVs =  vM[i][j] + vNext;
-                    vVOlds = vM[i][j+1] +vNext;
-                }//endtry
-                catch(Exception pE){ }
-
-                try{
-                    int vNext = 0;
-                    if(new Color(pEdge[i+1][j+1]) == vBlack) vNext = 3;
-                    if(new Color(pEdge[i+1][j+1]) == vGrey) vNext = 2;
-                    if(new Color(pEdge[i+1][j+1]) == vWhite) vNext = 1;
-                    vVse = vM[i][j] + vNext;
-                    vVOldse = vM[i+1][j+1];
-                }//endtry
-                catch(Exception pE){ }
-
-                try{
-                    int vNext = 0;
-                    if(new Color(pEdge[i-1][j+1]) == vBlack) vNext = 3;
-                    if(new Color(pEdge[i-1][j+1]) == vGrey) vNext = 2;
-                    if(new Color(pEdge[i-1][j+1]) == vWhite) vNext = 1;
-                    vVsw = vM[i][j] + vNext;
-                    vVOldsw = vM[i-1][j+1];
-                }//endtry
-                catch(Exception pE){}
-
-                if(vVsw < vVOldsw){
-                    vM[i-1][j+1] = vVsw;
-                    }//endif
-                if(vVse < vVOldse){
-                    vM[i+1][j+1] = vVse;
-                    }//endif
-                if(vVs < vVOlds){
-                    vM[i][j+1] = vVs;
-                }//endif
-            }//endfor
-        }//endfor
         return vM;
     }//calculerM()
+
 
     static public void createFile(final int[][][] pImageTab) throws Exception{
         File vOutputfile = new File("image.jpg");
@@ -218,18 +175,17 @@ public class SeamCarving {
 
     static public void main(final String[] args){
         try{
-            String vNameImage = "src/8k.jpg";
+            String vNameImage = "src/paysage.jpg";
             long vStart = new Date().getTime();
 
             createFile(createImageTab(vNameImage));
 
-            int[][] test = calculerM(detectEdge(createImageTab(vNameImage)));
+            detectEdge(createImageTab(vNameImage));
 
             long vEnd = new Date().getTime();
             long vTime = (vEnd - vStart);
             System.out.println("Temps d'excecution : " + vTime + " millisecondes.");
-
-
+            /*
             PrintWriter vWriter = new PrintWriter("m.txt");
             for(int i = 0; i < test.length;i++){
                 for(int j = 0; j < test[0].length;j++){
@@ -237,7 +193,7 @@ public class SeamCarving {
                 }//endfor
                 vWriter.println(" ");
             }//endfor
-            vWriter.close();
+            vWriter.close();*/
         }//end try
         catch(Exception pE){
 
