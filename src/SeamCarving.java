@@ -7,7 +7,6 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 
-
 public class SeamCarving {
 
     static public int[][][] createImageTab(final String pImageName) throws Exception {
@@ -132,31 +131,27 @@ public class SeamCarving {
         return vImageTab;
     }
 
-    static int[][]calculerM(final int[][] pEdge) throws Exception{ 
+    static int[][]calculerMColone(final int[][] pEdge) throws Exception{ 
         int vImageWidth = pEdge.length;
         int vImageHeight = pEdge[0].length;
-        int vInfini = Integer.MAX_VALUE;
-        int[][] vM = new int[vImageWidth][vImageHeight];
-        Color vBlack = new Color(0,0,0); //vaut 3
-        Color vGrey = new Color(127,127,127); //vaut 2
-        Color vWhite = new Color(255,255,255); //vaut 1
+        Color vBlack = new Color(0,0,0); //vaut 2
+        Color vGrey = new Color(127,127,127); //vaut 1
+        Color vWhite = new Color(255,255,255); //vaut 0
 
-        for(int i = 0; i < vImageWidth;i++){
-            for(int j = 0; j < vImageHeight;j++){
-                if(new Color(pEdge[i][j]).getRed() == vBlack.getRed()) vM[i][j] = 3;
-                if(new Color(pEdge[i][j]).getRed() == vGrey.getRed()) vM[i][j] = 2;
-                if(new Color(pEdge[i][j]).getRed() == vWhite.getRed()) vM[i][j] = 1;
-                int vSW = vM[i-1][j+1];
-                int vS = vM[i][j+1];
-                int vSE = vM[i][j+1];
-                vM[i][j] =  (int)Math.min(vSW, (int)Math.min(vS,vSE));
+    }//calculerMColonne()
 
-            }//endfor
+    static int afficherValeurMin(final int[][] pM){
+        int vRes = pM[pM.length-1][0];
+        int vIndice = 0;
+        for(int i=0; i<pM[0].length-1;i++){    
+            if(vRes > pM[pM.length-1][i + 1]){
+                vIndice = i+1;
+                vRes = pM[pM.length-1][i + 1];
+            }//endif
         }//endfor
-        
-        return vM;
-    }//calculerM()
-
+        System.out.println("La coccinelle a mange " + vRes + " pucerons.");
+        return vIndice;
+    }//afficherValeurMax()
 
     static public void createFile(final int[][][] pImageTab) throws Exception{
         File vOutputfile = new File("image.jpg");
@@ -175,25 +170,27 @@ public class SeamCarving {
 
     static public void main(final String[] args){
         try{
-            String vNameImage = "src/paysage.jpg";
+            String vNameImage = "src/20.png";
             long vStart = new Date().getTime();
 
             createFile(createImageTab(vNameImage));
 
-            detectEdge(createImageTab(vNameImage));
+            int[][] vEdge = detectEdge(createImageTab(vNameImage));
+            int[][] vColonne = calculerMColone(vEdge);
+            afficherValeurMin(vColonne);
 
             long vEnd = new Date().getTime();
             long vTime = (vEnd - vStart);
             System.out.println("Temps d'excecution : " + vTime + " millisecondes.");
-            /*
-            PrintWriter vWriter = new PrintWriter("m.txt");
-            for(int i = 0; i < test.length;i++){
-                for(int j = 0; j < test[0].length;j++){
-                    vWriter.print("" + test[i][j] + " ");
+            
+            PrintWriter vWriterColonne = new PrintWriter("mcolonne.txt");
+            for(int i = 0; i < vColonne.length;i++){
+                for(int j = 0; j < vColonne[0].length;j++){
+                    vWriterColonne.print("" + vColonne[i][j] + " ");
                 }//endfor
-                vWriter.println(" ");
+                vWriterColonne.println(" ");
             }//endfor
-            vWriter.close();*/
+            vWriterColonne.close();
         }//end try
         catch(Exception pE){
 
