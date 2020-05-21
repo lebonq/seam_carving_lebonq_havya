@@ -2,223 +2,356 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Stack;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
 public class SeamCarving {
+    static public long vTimeColonneStart = new Date().getTime();
+    static public long vTimeLigneStart = new Date().getTime();
+    static public int[][] vImageSeams;
 
-    static public int[][][] createImageTab(final String pImageName) throws Exception {
+    /**
+     * Permet de copier l'image pixel par pixel dans un tableau 2D
+     * @param pImageName String chemin d'acces de l'image
+     * @return int[]( )
+     * @throws Exception
+     */
+    static public int[][] createImageTab(final String pImageName) throws Exception {
 
         BufferedImage vImage = ImageIO.read(new File(pImageName));
 
         int vImageWidth = vImage.getWidth();
         int vImageHeight = vImage.getHeight();
-        int[][][] vImageTab = new int[vImageWidth][vImageHeight][3];
+        int[][] vImageTab = new int[vImageWidth][vImageHeight];
 
         for (int x = 0; x < vImageWidth; x++) {
             for (int y = 0; y < vImageHeight; y++) {
-                vImageTab[x][y][0] = new Color(vImage.getRGB(x, y)).getRed();
-                vImageTab[x][y][1] = new Color(vImage.getRGB(x, y)).getGreen();
-                vImageTab[x][y][2] = new Color(vImage.getRGB(x, y)).getBlue();
+                vImageTab[x][y] = vImage.getRGB(x, y);
             }
         }
         return vImageTab;
     }
 
-    static public int[][] detectEdge(final int[][][] pImage) throws Exception{
+    /**
+     * Permet de generer notre matrice avec les energies
+     * @param pImage int[][] Un tableau 2D avec la valeur RGB  de chaque pixel 
+     * @return pEdge int[][] Un tableau 2D avec la valeur de nos energies
+     * @throws Exception
+     */
+    static public int[][] detectEdge(final int[][] pImage) throws Exception{
         int vImageWidth = pImage.length;
         int vImageHeight = pImage[0].length;
         BufferedImage vImage = new BufferedImage(vImageWidth,vImageHeight,TYPE_INT_RGB);
-        Color vBlack = new Color(0,0,0);
-        Color vGrey = new Color(127,127,127);
-        Color vWhite = new Color(255,255,255);
-        int[][] vImageTab = new int[vImageWidth][vImageHeight];
-        for(int w = 14; w <15; w++){
-        
-        for (int y = 0; y < vImageHeight; y++) {
-            for (int x = 0; x < vImageWidth; x++) {
-                vImageTab[x][y] = vBlack.getRGB();
-                vImage.setRGB(x, y, vBlack.getRGB());
-            }
-        }
-
-        int vNextPixel = w;
-        double vThresholdMin = 1;
-        double vThresholdMax = 2.5;
-        double vCurrent = 0;
-        double vTop = 0;
-        double vBot = 0;
-        double vLeft = 0;
-        double vRight = 0;
-        double vLeftTop = 0;
-        double vRightTop = 0;
-        double vRightBot = 0;
-        double vLeftBot = 0;
-
-        for (int x = 0; x < vImageWidth; x++) {
-            for (int y = 0; y < vImageHeight; y++) {
-                vCurrent = (pImage[x][y][0] + pImage[x][y][1] + pImage[x][y][2]) / 3;
-                try {
-                    vTop = (pImage[x - vNextPixel][y][0] + pImage[x - vNextPixel][y][1] + pImage[x - vNextPixel][y][2])
-                            / 3;
-                } catch (Exception pE) {
-                }
-                try {
-                    vBot = (pImage[x + vNextPixel][y][0] + pImage[x + vNextPixel][y][1] + pImage[x + vNextPixel][y][2])
-                            / 3;
-                } catch (Exception pE) {
-                }
-                try {
-                    vLeft = (pImage[x][y - vNextPixel][0] + pImage[x][y - vNextPixel][1] + pImage[x][y - vNextPixel][2])
-                            / 3;
-                } catch (Exception pE) {
-                }
-                try {
-                    vRight = (pImage[x][y + vNextPixel][0] + pImage[x][y + vNextPixel][1]
-                            + pImage[x][y + vNextPixel][2]) / 3;
-                } catch (Exception pE) {
-                }
-                try {
-                    vRightTop = (pImage[x - vNextPixel][y + vNextPixel][0] + pImage[x - vNextPixel][y + vNextPixel][1]
-                            + pImage[x - vNextPixel][y + vNextPixel][2]) / 3;
-                } catch (Exception pE) {
-                }
-                try {
-                    vRightBot = (pImage[x + vNextPixel][y + vNextPixel][0] + pImage[x + vNextPixel][y + vNextPixel][1]
-                            + pImage[x + vNextPixel][y + vNextPixel][2]) / 3;
-                } catch (Exception pE) {
-                }
-                try {
-                    vLeftTop = (pImage[x - vNextPixel][y - vNextPixel][0] + pImage[x - vNextPixel][y - vNextPixel][1]
-                            + pImage[x - vNextPixel][y - vNextPixel][2]) / 3;
-                } catch (Exception pE) {
-                }
-                try {
-                    vLeftBot = (pImage[x + vNextPixel][y - vNextPixel][0] + pImage[x + vNextPixel][y - vNextPixel][1]
-                            + pImage[x + vNextPixel][y - vNextPixel][2]) / 3;
-                } catch (Exception pE) {
-                }
-
-                if (Math.abs(vCurrent - vLeft) <= vThresholdMin || Math.abs(vCurrent - vRight) <= vThresholdMin) {
-                    vImage.setRGB(x, y, vWhite.getRGB());
-                    vImageTab[x][y] = vWhite.getRGB();
-                } else if ((Math.abs(vCurrent - vLeft) <= vThresholdMax && Math.abs(vCurrent - vLeft) > vThresholdMin)
-                        || (Math.abs(vCurrent - vRight) <= vThresholdMax
-                                && Math.abs(vCurrent - vRight) > vThresholdMin)) {
-                    vImage.setRGB(x, y, vGrey.getRGB());
-                    vImageTab[x][y] = vGrey.getRGB();
-                }
-                if (Math.abs(vCurrent - vTop) <= vThresholdMin || Math.abs(vCurrent - vBot) <= vThresholdMin) {
-                    vImage.setRGB(x, y, vWhite.getRGB());
-                    vImageTab[x][y] = vWhite.getRGB();
-                } else if ((Math.abs(vCurrent - vTop) <= vThresholdMax && Math.abs(vCurrent - vTop) > vThresholdMin)
-                        || (Math.abs(vCurrent - vBot) <= vThresholdMax && Math.abs(vCurrent - vBot) > vThresholdMin)) {
-                    vImage.setRGB(x, y, vGrey.getRGB());
-                    vImageTab[x][y] = vGrey.getRGB();
-                }
-                if (Math.abs(vCurrent - vRightTop) <= vThresholdMin || Math.abs(vCurrent - vLeftTop) <= vThresholdMin) {
-                    vImage.setRGB(x, y, vWhite.getRGB());
-                    vImageTab[x][y] = vWhite.getRGB();
-                } else if ((Math.abs(vCurrent - vRightTop) <= vThresholdMax
-                        && Math.abs(vCurrent - vRightTop) > vThresholdMin)
-                        || (Math.abs(vCurrent - vLeftTop) <= vThresholdMax
-                                && Math.abs(vCurrent - vLeftTop) > vThresholdMin)) {
-                    vImage.setRGB(x, y, vGrey.getRGB());
-                    vImageTab[x][y] = vGrey.getRGB();
-                }
-                if (Math.abs(vCurrent - vRightBot) <= vThresholdMin || Math.abs(vCurrent - vLeftBot) <= vThresholdMin) {
-                    vImage.setRGB(x, y, vWhite.getRGB());
-                    vImageTab[x][y] = vWhite.getRGB();
-                } else if ((Math.abs(vCurrent - vRightBot) <= vThresholdMax
-                        && Math.abs(vCurrent - vRightBot) > vThresholdMin)
-                        || (Math.abs(vCurrent - vLeftBot) <= vThresholdMax
-                                && Math.abs(vCurrent - vLeftBot) > vThresholdMin)) {
-                    vImage.setRGB(x, y, vGrey.getRGB());
-                    vImageTab[x][y] = vGrey.getRGB();
-                }
-            }
-        }
-
-
-        File vOutputfile = new File("edge" + w + ".jpg");
-        ImageIO.write(vImage, "jpg", vOutputfile);
-        }
-        return vImageTab;
-    }
-
-    static int[][]calculerMColone(final int[][] pEdge) throws Exception{ 
-        int vImageWidth = pEdge.length;
-        int vImageHeight = pEdge[0].length;
-        Color vBlack = new Color(0,0,0); //vaut 3
-        Color vGrey = new Color(127,127,127); //vaut 2
-        Color vWhite = new Color(255,255,255); //vaut 1
-        int[][] vEdgeValue = new int[vImageWidth][vImageHeight]; // pour stocker les valeurs en int de chaque couleur
-        int[][] vM = new int[vImageWidth][vImageHeight];
+        int[][] vEdgeTab = new int[vImageWidth][vImageHeight];
 
         for(int y = 0; y < vImageHeight; y++) { // On ajoute les valeurs pour avoir les couts de chaque pixel
             for (int x = 0; x < vImageWidth; x++) {
-                if (new Color(pEdge[x][y]).getRGB() == vWhite.getRGB())
-                    vEdgeValue[x][y] = 1;
-                if (new Color(pEdge[x][y]).getRGB() == vGrey.getRGB())
-                    vEdgeValue[x][y] = 2;
-                if (new Color(pEdge[x][y]).getRGB() == vBlack.getRGB())
-                    vEdgeValue[x][y] = 3;
-            }//endfor
-        }//endfor
+                int vCurrent = pImage[x][y];
+                int vTop = pImage[x][y];
+                int vBot = pImage[x][y];
+                int vLeft = pImage[x][y];
+                int vRight = pImage[x][y];
+                int vTopLeft = pImage[x][y];
+                int vTopRight = pImage[x][y];
+                int vBotLeft = pImage[x][y];
+                int vBotRight = pImage[x][y];
+                int vTopLeftP = pImage[x][y];
+                int vTopRightP = pImage[x][y];
+                int vBotLeftP = pImage[x][y];
+                int vBotRightP = pImage[x][y];
+                int vTopP = pImage[x][y];
+                int vBotP = pImage[x][y];
+                int vLeftP = pImage[x][y];
+                int vRightP = pImage[x][y];
+                int vTopMidLeft = pImage[x][y];
+                int vTopMidRight = pImage[x][y];
+                int vBotMidRight = pImage[x][y];
+                int vBotMidLeft = pImage[x][y];
+                int vLeftMidTop = pImage[x][y];
+                int vLeftMidBot = pImage[x][y];
+                int vRightMidTop = pImage[x][y];
+                int vRightMidBot = pImage[x][y];
 
-        for(int y = 0; y < 1; y++) { // On ajoute les valeurs dans la premiere ligne
-            for (int x = 0; x < vImageWidth;x++) {
-                vM[x][y] = vEdgeValue[x][y];
-            }//endfor
-        }//endfor
-
-        for(int y = 0; y < vImageHeight - 1; y++) {
-            for (int x = 0; x < vImageWidth; x++) {
-                int vBas = vM[x][y] + vEdgeValue[x][y + 1];
-
-                if (vBas < vM[x][y + 1] || vM[x][y + 1] == 0) { //Si vM == 0 on considere que cette case n'a jamais ete touche
-                    vM[x][y + 1] = vBas;
-                }
-                try{//on met un try pour eviter la sorti de tableau sur les bords
-                    int vDiagonaleDroite = vM[x][y] + vEdgeValue[x+1][y+1];
-                    if (vDiagonaleDroite < vM[x+1][y + 1] || vM[x+1][y + 1] == 0) {
-                        vM[x+1][y + 1] = vBas;
-                    }
+                try{
+                vTop = pImage[x][y-1];
+                vTopP = pImage[x][y-2];
                 }catch(Exception pE){}
                 try{
-                    int vDiagonaleGauche = vM[x][y] + vEdgeValue[x-1][y+1];
-                    if (vDiagonaleGauche < vM[x-1][y + 1] || vM[x-1][y + 1] == 0) {
-                        vM[x-1][y + 1] = vBas;
+                vBot = pImage[x][y+1];
+                vBotP = pImage[x][y+2];
+                }catch(Exception pE){}
+                try{
+                vRight = pImage[x+1][y];
+                vRightP = pImage[x+2][y];
+                }catch(Exception pE){}
+                try{
+                vLeft = pImage[x-1][y];
+                vLeftP = pImage[x-2][y];
+                }catch(Exception pE){}
+                try{
+                vTopRight = pImage[x+1][y-1];
+                vTopRightP = pImage[x+2][y-2];
+                vTopMidRight = pImage[x+1][y-2];
+                vRightMidTop = pImage[x+2][y-1];
+                }catch(Exception pE){}
+                try{
+                vTopLeft = pImage[x-1][y-1];
+                vTopLeftP = pImage[x-2][y-2];
+                vTopMidLeft = pImage[x-1][y-2];
+                vLeftMidTop = pImage[x-2][y-1];
+                }catch(Exception pE){}
+                try{
+                vBotRight = pImage[x+1][y+1];
+                vBotRightP = pImage[x+2][y+2];
+                vBotMidRight = pImage[x+1][y+2];
+                vRightMidBot = pImage[x+2][y+1];
+                }catch(Exception pE){}
+                try{
+                vBotLeft = pImage[x-1][y+1];
+                vBotLeftP = pImage[x-2][y+2];
+                vBotMidLeft = pImage[x-1][y+2];
+                vLeftMidBot = pImage[x-2][y+1];
+                }catch(Exception pE){}
+                
+                int vRedX = Math.abs(new Color(vRight).getRed() - new Color(vLeft).getRed());
+                int vGreenX = Math.abs(new Color(vRight).getGreen() - new Color(vLeft).getGreen());
+                int vBlueX = Math.abs(new Color(vRight).getBlue() - new Color(vLeft).getBlue());
+
+                int vRedY = Math.abs(new Color(vTop).getRed() - new Color(vBot).getRed());
+                int vGreenY = Math.abs(new Color(vTop).getGreen() - new Color(vBot).getGreen());
+                int vBlueY = Math.abs(new Color(vTop).getBlue() - new Color(vBot).getBlue());
+
+                int vRedX2 = 0;//Math.abs(new Color(vRightP).getRed() - new Color(vLeftP).getRed());
+                int vGreenX2 = 0;//Math.abs(new Color(vRightP).getGreen() - new Color(vLeftP).getGreen());
+                int vBlueX2 = 0;//Math.abs(new Color(vRightP).getBlue() - new Color(vLeftP).getBlue());
+
+                int vRedY2 = 0;//Math.abs(new Color(vTopP).getRed() - new Color(vBotP).getRed());
+                int vGreenY2 = 0;//Math.abs(new Color(vTopP).getGreen() - new Color(vBotP).getGreen());
+                int vBlueY2 = 0;//Math.abs(new Color(vTopP).getBlue() - new Color(vBotP).getBlue());
+
+                int vRedXY = Math.abs(new Color(vTopRight).getRed() - new Color(vBotLeft).getRed());
+                int vGreenXY = Math.abs(new Color(vTopRight).getGreen() - new Color(vBotLeft).getGreen());
+                int vBlueXY = Math.abs(new Color(vTopRight).getBlue() - new Color(vBotLeft).getBlue());
+
+                int vRedYX = Math.abs(new Color(vBotRight).getRed() - new Color(vTopLeft).getRed());
+                int vGreenYX = Math.abs(new Color(vBotRight).getGreen() - new Color(vTopLeft).getGreen());
+                int vBlueYX = Math.abs(new Color(vBotRight).getBlue() - new Color(vTopLeft).getBlue());
+
+                int vRedXY2 = 0;//Math.abs(new Color(vTopRightP).getRed() - new Color(vBotLeftP).getRed());
+                int vGreenXY2 = 0;//Math.abs(new Color(vTopRightP).getGreen() - new Color(vBotLeftP).getGreen());
+                int vBlueXY2 = 0;//Math.abs(new Color(vTopRightP).getBlue() - new Color(vBotLeftP).getBlue());
+
+                int vRedYX2 = 0;//Math.abs(new Color(vBotRightP).getRed() - new Color(vTopLeftP).getRed());
+                int vGreenYX2 = 0;//Math.abs(new Color(vBotRightP).getGreen() - new Color(vTopLeftP).getGreen());
+                int vBlueYX2 = 0;//Math.abs(new Color(vBotRightP).getBlue() - new Color(vTopLeftP).getBlue());
+
+                int vRedYX3 = 0;//Math.abs(new Color(vBotMidRight).getRed() - new Color(vTopMidLeft).getRed());
+                int vGreenYX3 = 0;//Math.abs(new Color(vBotMidRight).getGreen() - new Color(vTopMidLeft).getGreen());
+                int vBlueYX3 = 0;//Math.abs(new Color(vBotMidRight).getBlue() - new Color(vTopLeftP).getBlue());
+
+                int vRedYX4 = 0;//Math.abs(new Color(vBotMidLeft).getRed() - new Color(vTopMidRight).getRed());
+                int vGreenYX4 = 0;//Math.abs(new Color(vBotMidLeft).getGreen() - new Color(vTopMidRight).getGreen());
+                int vBlueYX4 = 0;//Math.abs(new Color(vBotMidLeft).getBlue() - new Color(vTopMidRight).getBlue());
+
+                int vRedYX5 = 0;//Math.abs(new Color(vLeftMidTop).getRed() - new Color(vRightMidBot).getRed());
+                int vGreenYX5 = 0;//Math.abs(new Color(vLeftMidTop).getGreen() - new Color(vRightMidBot).getGreen());
+                int vBlueYX5 = 0;//Math.abs(new Color(vLeftMidTop).getBlue() - new Color(vRightMidBot).getBlue());
+
+                int vRedYX6 = 0;//Math.abs(new Color(vLeftMidBot).getRed() - new Color(vRightMidTop).getRed());
+                int vGreenYX6 = 0;//Math.abs(new Color(vLeftMidBot).getGreen() - new Color(vRightMidTop).getGreen());
+                int vBlueYX6 = 0;//Math.abs(new Color(vLeftMidBot).getBlue() - new Color(vRightMidTop).getBlue());
+                
+                vEdgeTab[x][y] = vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY
+                               + vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6
+                               + vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6;
+                
+
+                // Filtre Laplacien
+                /*
+                vEdgeTab[x][y] = -4*(((new Color(vCurrent).getRed())+(new Color(vCurrent).getBlue())+(new Color(vCurrent).getBlue()))/3)
+                                 +1*(((new Color(vTop).getRed())+(new Color(vTop).getBlue())+(new Color(vTop).getBlue()))/3)
+                                 +1*(((new Color(vBot).getRed())+(new Color(vBot).getBlue())+(new Color(vBot).getBlue()))/3)
+                                 +1*(((new Color(vLeft).getRed())+(new Color(vLeft).getBlue())+(new Color(vLeft).getBlue()))/3)
+                                 +1*(((new Color(vRight).getRed())+(new Color(vRight).getBlue())+(new Color(vRight).getBlue()))/3);*/
+
+                vImage.setRGB(x,y,new Color((vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY)/24,
+                                            (vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6)/24,
+                                            (vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6)/24).getRGB());
+            }
+        }
+
+        File vOutputfile = new File("output/edge.png");
+        ImageIO.write(vImage, "png", vOutputfile);
+        return vEdgeTab;
+    }
+
+    /** permet de calculer les chemins de valeurs minimun verticale
+     * @param pEdge tableau avec les valeurs des bords
+     */
+    static int[][]calculerMColone(final int[][] pEdge) throws Exception{ 
+        int vImageWidth = pEdge.length;
+        int vImageHeight = pEdge[0].length;
+        int[][] vM = new int[vImageWidth][vImageHeight];
+
+        for(int y = 0; y < 1; y++) { // On ajoute les valeurs dans la premiere ligne
+            for (int x = 0; x <vImageWidth;x++) {
+                vM[x][y] = pEdge[x][y];
+            }//endfor
+        }//endfor
+
+        for(int y = 1; y < vImageHeight; y++) { // On met -1 partout pour dire que la case n'a jamais ete ecrite
+            for (int x = 0; x < vImageWidth;x++) {
+                vM[x][y] = -1;
+            }//endfor
+        }//endfor
+
+        
+        for(int y = 0; y < vImageHeight-1; y++) {
+            for (int x = 0; x < vImageWidth; x++) {
+                int vBas = vM[x][y] + pEdge[x][y + 1];
+
+                if (vBas < vM[x][y + 1] || vM[x][y + 1] == -1) { // Si vM == -1 on considere que cette case n'a jamais
+                                                                 // ete touche
+                    vM[x][y + 1] = vBas;
+                }
+                try {// on met un try pour eviter la sorti de tableau sur les bords
+                    int vDiagonaleDroite = vM[x][y] + pEdge[x + 1][y + 1];
+                    if (vDiagonaleDroite < vM[x + 1][y + 1] || vM[x + 1][y + 1] == -1) {
+                        vM[x + 1][y + 1] = vDiagonaleDroite;
+                    }//endif
+                } catch (Exception pE) {
+                }
+                try {
+                    int vDiagonaleGauche = vM[x][y] + pEdge[x - 1][y + 1];
+                    if (vDiagonaleGauche < vM[x-1][y + 1] || vM[x-1][y + 1] == -1) {
+                        vM[x-1][y + 1] = vDiagonaleGauche;
                     }
                 }catch(Exception pE){}
             }//endfor
         }//endfor
-        System.gc();//force le garbage collector a fonctionner
+
         return vM;
     }//calculerMColonne()
+
+    /** permet de calculer les chemins de valeurs minimun horizontal
+     * @param pEdge tableau avec les valeurs des bords
+     */
+    static int[][]calculerMLigne(final int[][] pEdge) throws Exception{ 
+        int vImageWidth = pEdge.length;
+        int vImageHeight = pEdge[0].length;
+        int[][] vM = new int[vImageWidth][vImageHeight];
+
+        for(int y = 0; y < vImageHeight; y++) { // On ajoute les valeurs dans la premiere ligne
+            for (int x = 0; x <1;x++) {
+                vM[x][y] = pEdge[x][y];
+            }//endfor
+        }//endfor
+
+        for(int y = 0; y < vImageHeight; y++) { // On met -1 partout pour dire que la case n'a jamais ete ecrite
+            for (int x = 1; x < vImageWidth;x++) {
+                vM[x][y] = -1;
+            }//endfor
+        }//endfor
+
+        
+        for(int y = 0; y < vImageHeight; y++) {
+            for (int x = 0; x < vImageWidth-1; x++) {
+                int vDroite = vM[x][y] + pEdge[x+1][y];
+
+                if (vDroite < vM[x + 1][y] || vM[x + 1][y] == -1) { // Si vM == -1 on considere que cette case n'a jamais
+                                                                 // ete touche
+                    vM[x+1][y] = vDroite;
+                }
+                try {// on met un try pour eviter la sorti de tableau sur les bords
+                    int vDiagonaleHaut = vM[x][y] + pEdge[x + 1][y - 1];
+                    if (vDiagonaleHaut < vM[x + 1][y - 1] || vM[x + 1][y - 1] == -1) {
+                        vM[x + 1][y - 1] = vDiagonaleHaut;
+                    }
+                } catch (Exception pE) {
+                }
+                try {
+                    int vDiagonaleBas = vM[x][y] + pEdge[x + 1][y + 1];
+                    if (vDiagonaleBas < vM[x+1][y + 1] || vM[x+1][y + 1] == -1) {
+                        vM[x+1][y + 1] = vDiagonaleBas;
+                    }
+                }catch(Exception pE){}
+            }//endfor
+        }//endfor
+
+        PrintWriter vWriterColonne = new PrintWriter("mligne.txt");
+            
+            for(int j = 0; j < pEdge[0].length;j++){
+                for(int i = 0; i < pEdge.length;i++){
+                    vWriterColonne.print("" + vM[i][j] + " ");
+                }//endfor
+                vWriterColonne.println(" ");
+            }//endfor
+            vWriterColonne.close();
+
+        return vM;
+    }//calculerMLigne()
 
     /**
      * Permet de calculer la valeur minimal ainsi que ses coordonnées
      * @param pM Matrice de coup minimun
      * @param pY Valeur de depart de Y
+     * @return Un tableau de int, en 0 la valeur minimum, et 1 sa postion en x et en 2 sa postion en y
+     */
+    static public int[] minValueColonne(final int[][] pM, final int pY){
+        int vValMin = pM[0][pY];
+        Random vRand = new Random();
+        int[] vRandom = new int[pM.length];
+        int vCpt = 0;
+
+        for(int x = 0; x < pM.length;x++){
+            if(vValMin >= pM[x][pY]) {
+                vValMin = pM[x][pY];
+            } // endif
+        } // endfor
+
+        for(int x = 0; x < pM.length;x++){
+            
+            if(vValMin == pM[x][pY]) {
+                vRandom[vCpt] = x;
+                vCpt++;
+            } // endif
+        } // endfor
+        
+        return new int[] { vValMin,vRandom[vRand.nextInt(vCpt)] ,pY }; 
+    }//minValueColonne()
+
+    /**
+     * Permet de calculer la valeur minimal ainsi que ses coordonnées
+     * @param pM Matrice de coup minimun
      * @param pX Valeur de depart de X
      * @return Un tableau de int, en 0 la valeur minimum, et 1 sa postion en x et en 2 sa postion en y
      */
-    static public int[] minValue(final int[][] pM, final int pY,final int pX){
-        int vXVal = pX;
-        int vYVal = pY;
-        int vValMin = pM[pX][pY];
+    static public int[] minValueLigne(final int[][] pM, final int pX){
+        int vValMin = pM[pX][0];
+        Random vRand = new Random();
+        int[] vRandom = new int[pM[0].length];
+        int vCpt = 0;
 
-        for(int x = 0; x < pM.length;x++){
-            if(vValMin > pM[x][vYVal]) {
-                vValMin = pM[x][vYVal];
-                vXVal = x;
+        for(int y = 0; y < pM[0].length;y++){
+            if(vValMin >= pM[pX][y]) {
+                vValMin = pM[pX][y];
             } // endif
         } // endfor
-        return new int[] { vValMin, vXVal, vYVal };
-    }//minValue()
+
+        for(int y = 0; y < pM[0].length;y++){
+            
+            if(vValMin == pM[pX][y]) {
+                vRandom[vCpt] = y;
+                vCpt++;
+            } // endif
+        } // endfor
+        
+        return new int[] { vValMin, pX,vRandom[vRand.nextInt(vCpt)] }; 
+    }//minValueColonne()
 
     /**
      * retourne un stack avec en haut la derniere composante
@@ -226,12 +359,11 @@ public class SeamCarving {
      * @param pValMin tableau retourné par minValue()
      * @return Stack<int[]> avec en 0 la coordonée x et en 1 y
      */
-    static public Stack<int[]> ccm(final int[][] pM,final int[] pValMin){
+    static public Stack<int[]> ccmColonne(final int[][] pM,final int[] pValMin){
         int vXDepart = pValMin[1];
         int vYDepart = pValMin[2];
         int Infini = Integer.MAX_VALUE;
         if(vYDepart == 0 ){ //fin de notre reccurence
-            //System.out.print("("+vXDepart+","+vYDepart+")");
             Stack<int[]> vReturn = new Stack<int[]>();
             vReturn.push(new int[]{vXDepart,vYDepart});
             return vReturn;
@@ -247,32 +379,80 @@ public class SeamCarving {
         }catch(Exception pE){}
 
         if(pM[vXDepart][vYDepart-1] < Math.min(vDiagonaleGauche, vDiagonaleDroite)) {
-            Stack<int[]> vReturn = ccm(pM, new int[]{pValMin[0],vXDepart,vYDepart-1});
-            //System.out.print("("+vXDepart+","+vYDepart+")");
+            Stack<int[]> vReturn = ccmColonne(pM, new int[]{pValMin[0],vXDepart,vYDepart-1});
             vReturn.push(new int[]{vXDepart,vYDepart});
             return vReturn;
             
         }//endif
-        else if(vDiagonaleGauche < vDiagonaleDroite){
-            Stack<int[]> vReturn = ccm(pM, new int[]{pValMin[0],vXDepart-1,vYDepart-1});
-            //System.out.print("("+vXDepart+","+vYDepart+")");
+        else if(vDiagonaleGauche > vDiagonaleDroite){
+            Stack<int[]> vReturn = ccmColonne(pM, new int[]{pValMin[0],vXDepart+1,vYDepart-1});
             vReturn.push(new int[]{vXDepart,vYDepart});
             return vReturn;
         }//ende lse if
         else{
-            Stack<int[]> vReturn = ccm(pM, new int[]{pValMin[0],vXDepart+1,vYDepart-1});
-            //System.out.print("("+vXDepart+","+vYDepart+")");
+            Stack<int[]> vReturn = ccmColonne(pM, new int[]{pValMin[0],vXDepart-1,vYDepart-1});
             vReturn.push(new int[]{vXDepart,vYDepart});
             return vReturn;
         }//end else
-    }//ccm()
+    }//ccmColonne()
     
-    static public int conversionPourcentageLigne (final int[][][] pImage, final int pPourcentage){
-        return (pImage.length*pPourcentage)/100;
+        /**
+     * retourne un stack avec en haut la derniere composante
+     * @param pM Matrice de coup minimun
+     * @param pValMin tableau retourné par minValue()
+     * @return Stack<int[]> avec en 0 la coordonée x et en 1 y
+     */
+    static public Stack<int[]> ccmLigne(final int[][] pM,final int[] pValMin){
+        int vXDepart = pValMin[1];
+        int vYDepart = pValMin[2];
+        int Infini = Integer.MAX_VALUE;
+        
+        if(vXDepart == 0 ){ //fin de notre reccurence
+            Stack<int[]> vReturn = new Stack<int[]>();
+            vReturn.push(new int[]{vXDepart,vYDepart});
+            return vReturn;
+        }//end if
+        int vDiagonaleHaut = Infini;
+        int vDiagonaleBas = Infini;
+
+        try{
+            vDiagonaleHaut = pM[vXDepart-1][vYDepart-1];
+        }catch(Exception pE){}
+        try{
+            vDiagonaleBas = pM[vXDepart-1][vYDepart+1];
+        }catch(Exception pE){}
+
+        if(pM[vXDepart-1][vYDepart] < Math.min(vDiagonaleBas, vDiagonaleHaut)) {
+            Stack<int[]> vReturn = ccmLigne(pM, new int[]{pValMin[0],vXDepart-1,vYDepart});
+            vReturn.push(new int[]{vXDepart,vYDepart});
+            return vReturn;
+            
+        }//endif
+        else if(vDiagonaleBas > vDiagonaleHaut){
+            Stack<int[]> vReturn = ccmLigne(pM, new int[]{pValMin[0],vXDepart-1,vYDepart-1});
+            vReturn.push(new int[]{vXDepart,vYDepart});
+            return vReturn;
+        }//ende lse if
+        else{
+            Stack<int[]> vReturn = ccmLigne(pM, new int[]{pValMin[0],vXDepart-1,vYDepart+1});
+            vReturn.push(new int[]{vXDepart,vYDepart});
+            return vReturn;
+        }//end else
+    }//ccmColonne()
+
+    /**
+     * Permet de convertir le pourcentage entree en parametre en un entier du nombre de ligne a supprimer
+     * @param pImage Matrice 2D de l'image
+     * @param pPourcentage Entier du pourcentage de ligne a retirer
+     * @return entier du nombre de ligne a retirer
+     */
+    static public int conversionPourcentageLigne (final int[][] pImage, final int pPourcentage){
+        return (pImage[0].length*pPourcentage)/100;
     }//conversionPourcentageLigne
     
-    static public int conversionPourcentageColonne (final int[][][] pImage, final int pPourcentage){
-        return (pImage[0].length*pPourcentage)/100;
+    //Similaire a la précedente mais pour les colonnes
+    static public int conversionPourcentageColonne (final int[][] pImage, final int pPourcentage){
+        return (pImage.length*pPourcentage)/100;
     }//conversionPourcentageColonne
 
     /**
@@ -283,89 +463,179 @@ public class SeamCarving {
      * @return Tableau de l'image avec p colonne en moins mais matrice non redimensionné
      * @throws Exception
      */
-    static public int[][][] retirerColonne(final int pColonne, final int[][] pEdge, final int [][][] pImageTab) throws Exception{
+    static public int[][] retirerColonne(final int pColonne, final int[][] pEdge, final int [][] pImageTab) throws Exception{
+        System.gc();//Force le garbage collector
         int[][] vEdgeModifie = pEdge;
-        int[][][] vImageTabModifie = pImageTab;
-        int[][] vMColonne = calculerMColone(pEdge);
-        int[] vColonneValue = minValue(vMColonne,vMColonne[0].length-1,0);
-        Stack<int[]> vStack = ccm(vMColonne, vColonneValue);
-        int vHeight = pImageTab[0].length;
-        if(pColonne == -1){
-            return pImageTab;
-        }//endif
+        int[][] vImageTabModifie = pImageTab;
+        int vColonne = pColonne;
 
-        for(int y = vHeight-1; y > -1;  y--){
-            int[] vPixel = vStack.pop();
-            vImageTabModifie = decalerLigne3D(vPixel,vImageTabModifie);
-            vEdgeModifie = decalerLigne2D(vPixel,vEdgeModifie);
-        }//endfor
-        System.gc();//force le garbage collector a fonctionner
-        return retirerColonne(pColonne-1, vEdgeModifie, vImageTabModifie);
-    }//retirerColonne()
-
-    static public int[][][] decalerLigne3D(final int[] pPixel, final int[][][] pImageTab){
-        int[][][] vImageTabModifie = pImageTab;
-        int vWidth = pImageTab.length;
-        for(int x = pPixel[0];x < vWidth-1;x++){
-            vImageTabModifie[x][pPixel[1]][0] = pImageTab[x+1][pPixel[1]][0];
-            vImageTabModifie[x][pPixel[1]][1] = pImageTab[x+1][pPixel[1]][1];
-            vImageTabModifie[x][pPixel[1]][2] = pImageTab[x+1][pPixel[1]][2];
+        while(vColonne != 0){
+            if(vColonne%50 == 0){
+                long vEnd = new Date().getTime();
+                System.out.print("  " + (((vEnd - vTimeColonneStart)*(vColonne/50))/1000) + " seconds remaining.\n"); //permet d'afficher le temps de calcul restant
+                vTimeColonneStart = new Date().getTime();
+            }//endif
+            int[][] vMColonne = calculerMColone(vEdgeModifie);
+            int[] vColonneValue = minValueColonne(vMColonne,vMColonne[0].length-1);
+            vEdgeModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vEdgeModifie,vColonne,vMColonne,vColonneValue);
+            vImageTabModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vImageTabModifie,vColonne,vMColonne,vColonneValue);
+            //vEdgeModifie = detectEdge(vImageTabModifie);
+            vColonne--;
         }
-        vImageTabModifie[vWidth-1][pPixel[1]][0] = 0;
-        vImageTabModifie[vWidth-1][pPixel[1]][1] = 0;
-        vImageTabModifie[vWidth-1][pPixel[1]][2] = 0;
+
         return vImageTabModifie;
-        
-    }//decalerLigne3D()
 
-    static public int[][] decalerLigne2D(final int[] pPixel, final int[][] pEdge){
-        int[][] vEdgeModifie = pEdge;
-        int vWidth = pEdge.length;
-        Color vBlack = new Color(0,0,0);
-
-        for (int x = pPixel[0]; x < vWidth - 1; x++) {
-            vEdgeModifie[x][pPixel[1]] = pEdge[x + 1][pPixel[1]];
-            vEdgeModifie[x][pPixel[1]] = pEdge[x + 1][pPixel[1]];
-            vEdgeModifie[x][pPixel[1]] = pEdge[x + 1][pPixel[1]];
-        }
-        vEdgeModifie[vWidth - 1][pPixel[1]] =  vBlack.getRGB();
-        return vEdgeModifie;
-        
-    }//decalerLigne3D()
+    }//retirerColonne()
     
-    static public void createFile(final int[][][] pImageTab,final int pColonne) throws Exception{
-        File vOutputfile = new File("image_redimensionnee.jpg");
-        int vWidth = pImageTab.length-pColonne;
-        int vHeight = pImageTab[0].length;
-        BufferedImage vImage = new BufferedImage(vWidth,vHeight,TYPE_INT_RGB);
+    /**
+     * Permet de retirer le nombre de ligne necessaire
+     * @param pLigne nombre de lignes de pixel a retirer
+     * @param pEdge Image avec les bords affichés 
+     * @param pImageTab Image source
+     * @return Tableau de l'image avec p colonne en moins mais matrice non redimensionné
+     * @throws Exception
+     */
+    static public int[][] retirerLigne(final int pLigne, final int[][] pEdge, final int [][] pImageTab) throws Exception{
+        System.gc();//Force le garbage collector
+        int[][] vEdgeModifie = pEdge;
+        int[][] vImageTabModifie = pImageTab;
+        int vLigne = pLigne;
+
+        while(vLigne != 0){
+            if(vLigne%50 == 0){
+                long vEnd = new Date().getTime();
+                System.out.print("  " + (((vEnd - vTimeLigneStart)*(vLigne/50))/1000) + " seconds remaining.\n"); //permet d'afficher le temps de calcul restant
+                vTimeLigneStart = new Date().getTime();
+            }//endif
+            int[][] vMLigne = calculerMLigne(vEdgeModifie);
+            int[] vLigneValue = minValueLigne(vMLigne,vMLigne.length-1);
+            vEdgeModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vEdgeModifie,vLigne,vMLigne,vLigneValue);
+            vImageTabModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vImageTabModifie,vLigne,vMLigne,vLigneValue);
+            vLigne--;
+        }
+
+        return vImageTabModifie;
+
+    }//retirerLigne()
+
+
+    static public int[][] decalerLigne(final Stack<int[]> pPixel, final int[][] pImageTab,final int pColonne,final int[][] pMColonne, final int[] pColonneValue) throws Exception{
+        int[][] vImageReturn = new int[pImageTab.length-1][pImageTab[0].length];
         
-        for(int x = 0; x < vWidth;x++){
-            for(int y = 0; y < vHeight; y++) {
-                Color vColor = new Color(pImageTab[x][y][0], pImageTab[x][y][1], pImageTab[x][y][2]);
-                vImage.setRGB(x, y, vColor.getRGB());
+        //decommenter les lignes suivantes pour creer tracer les seams
+        /*
+        Stack<int[]> vStack = ccm(pMColonne, pColonneValue);
+        vImageSeams = pImageTab;
+        for(int y = 0; y < vImageSeams[0].length; y++) {
+            int[] test = vStack.pop();
+            for(int x = 0; x < vImageSeams.length;x++){
+                vImageSeams[test[0]][test[1]] = new Color(255,0,0).getRGB();
+            }
+        }*/
+        //createFile(vImageSeams, "animation/" + Math.abs(pColonne-1142));
+
+        for(int y = 0; y < vImageReturn[0].length; y++) {
+            for(int x = 0; x < vImageReturn.length;x++){
+                vImageReturn[x][y] = pImageTab[x][y];
             }
         }
-        ImageIO.write(vImage, "jpg", vOutputfile);
+        for(int y = 0; y < pImageTab[0].length; y ++){
+            int[] vPixel = pPixel.pop();
+            for(int x = vPixel[0]; x < pImageTab.length-1;x++){
+                vImageReturn[x][vPixel[1]] = pImageTab[x+1][vPixel[1]];
+            }
+        }
+        //System.out.println(pImageReturn.length);
+        return vImageReturn;
+                
+    }//decalerLigne()
+
+    static public int[][] decalerColonne(final Stack<int[]> pPixel, final int[][] pImageTab,final int pLigne,final int[][] pMLigne, final int[] pLigneValue) throws Exception{
+        int[][] vImageReturn = new int[pImageTab.length][pImageTab[0].length-1];
+        
+        //decommenter les lignes suivantes pour creer l'animation
+        /*
+        Stack<int[]> vStack = ccm(pMColonne, pColonneValue);
+        vImageSeams = pImageTab;
+        for(int y = 0; y < vImageSeams[0].length; y++) {
+            int[] test = vStack.pop();
+            for(int x = 0; x < vImageSeams.length;x++){
+                vImageSeams[test[0]][test[1]] = new Color(255,0,0).getRGB();
+            }
+        }
+        createFile(vImageSeams, "animation/" + Math.abs(pColonne-1142));*/
+
+        for(int y = 0; y < vImageReturn[0].length; y++) {
+            for(int x = 0; x < vImageReturn.length;x++){
+                vImageReturn[x][y] = pImageTab[x][y];
+            }
+        }
+        for(int x = 0; x < pImageTab.length; x ++){
+            int[] vPixel = pPixel.pop();
+            for(int y = vPixel[1]; y < pImageTab[0].length-1;y++){
+                vImageReturn[vPixel[0]][y] = pImageTab[vPixel[0]][y+1];
+            }
+        }
+        //System.out.println(pImageReturn.length);
+        return vImageReturn;
+                
+    }//decalerColonne()
+
+
+    /**
+     * Permet de créer un fichier png a partir du tableau en parametre
+     * @param pImageTab tableau 2D qui contient la valeur RGB en un int signé
+     * @param pName String du nom du fichier
+     * @throws Exception Erreur lors de l'écriture
+     */
+    static public void createFile(final int[][] pImageTab, final String pName) throws Exception{
+        File vOutputfile = new File(pName + ".png");
+        int vWidth = pImageTab.length;
+        int vHeight = pImageTab[0].length;
+        BufferedImage vImage = new BufferedImage(vWidth,vHeight,TYPE_INT_RGB);
+
+        for(int y = 0; y < vHeight; y++) {
+            for(int x = 0; x < vWidth;x++){
+                vImage.setRGB(x, y, pImageTab[x][y]);
+            }
+        }
+        ImageIO.write(vImage, "png", vOutputfile);
     }//createFile()
+
 
     static public void main(final String[] args){
         try{
-            String vNameImage = args[0];
+            String vNameImage = "src/seamcarvingdemo.jpg";//args[0];
             long vStart = new Date().getTime();
-            System.out.print("Processing : ");
+            System.out.print("Processing : \n");
             
+            System.out.print("Loading file.\n");
+            int[][] vImageTab = createImageTab(vNameImage);
 
-            int[][][] vImageTab = createImageTab(vNameImage);
+            System.out.print("Calculating gradient for each pixel, vertically.\n");
             int[][] vEdge = detectEdge(vImageTab);
 
-            int vPourcentageColonne = Integer.parseInt(args[1]);
-            int vColonneToDelete = conversionPourcentageColonne(vImageTab, vPourcentageColonne);
-            int[][][] vImageRedimensionnee = retirerColonne(vColonneToDelete, vEdge, vImageTab);
-            createFile(vImageRedimensionnee,vColonneToDelete);
+            int vPourcentageColonne =50;//Integer.parseInt(args[1]);
+            int vPourcentageLigne =0;//Integer.parseInt(args[2]);
+            int vColonneToDelete = conversionPourcentageColonne(vImageTab, vPourcentageColonne); 
+            System.out.print("Calculating gradient for each pixel, horizontally.\n");
+            int vLigneToDelete = conversionPourcentageLigne(vImageTab, vPourcentageLigne);
+            
+            vImageSeams = new int[vImageTab.length][vImageTab[0].length]; //Localisation des pixels des seams
+
+            System.out.print("Finding shortest paths and editing image.\n");
+            
+            int[][] vImageRedimensionnee = retirerColonne(vColonneToDelete, vEdge, vImageTab);
+            vImageRedimensionnee = retirerLigne(vLigneToDelete, detectEdge(vImageRedimensionnee), vImageRedimensionnee); //On recupere limage avec les colonnes en moins et on retire les lignes
+
+            System.out.print("Saving file.\n");
+            createFile(vImageRedimensionnee,"output/final");
+
+            System.out.println("\nDone !\n");
 
             long vEnd = new Date().getTime();
             long vTime = (vEnd - vStart);
-            System.out.println("Fait en " + vTime/1000 + " secondes.");
+            System.out.println("Total excecution time : " + vTime/1000 + " seconds.");
         }//end try
         catch(Exception pE){
 
