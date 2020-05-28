@@ -2,7 +2,6 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Stack;
 import java.util.Random;
@@ -125,13 +124,13 @@ public class SeamCarving {
                 int vGreenY = Math.abs(new Color(vTop).getGreen() - new Color(vBot).getGreen());
                 int vBlueY = Math.abs(new Color(vTop).getBlue() - new Color(vBot).getBlue());
 
-                int vRedX2 = 0;//Math.abs(new Color(vRightP).getRed() - new Color(vLeftP).getRed());
-                int vGreenX2 = 0;//Math.abs(new Color(vRightP).getGreen() - new Color(vLeftP).getGreen());
-                int vBlueX2 = 0;//Math.abs(new Color(vRightP).getBlue() - new Color(vLeftP).getBlue());
+                int vRedX2 = Math.abs(new Color(vRightP).getRed() - new Color(vLeftP).getRed());
+                int vGreenX2 = Math.abs(new Color(vRightP).getGreen() - new Color(vLeftP).getGreen());
+                int vBlueX2 = Math.abs(new Color(vRightP).getBlue() - new Color(vLeftP).getBlue());
 
-                int vRedY2 = 0;//Math.abs(new Color(vTopP).getRed() - new Color(vBotP).getRed());
-                int vGreenY2 = 0;//Math.abs(new Color(vTopP).getGreen() - new Color(vBotP).getGreen());
-                int vBlueY2 = 0;//Math.abs(new Color(vTopP).getBlue() - new Color(vBotP).getBlue());
+                int vRedY2 = Math.abs(new Color(vTopP).getRed() - new Color(vBotP).getRed());
+                int vGreenY2 = Math.abs(new Color(vTopP).getGreen() - new Color(vBotP).getGreen());
+                int vBlueY2 = Math.abs(new Color(vTopP).getBlue() - new Color(vBotP).getBlue());
 
                 int vRedXY = Math.abs(new Color(vTopRight).getRed() - new Color(vBotLeft).getRed());
                 int vGreenXY = Math.abs(new Color(vTopRight).getGreen() - new Color(vBotLeft).getGreen());
@@ -141,29 +140,29 @@ public class SeamCarving {
                 int vGreenYX = Math.abs(new Color(vBotRight).getGreen() - new Color(vTopLeft).getGreen());
                 int vBlueYX = Math.abs(new Color(vBotRight).getBlue() - new Color(vTopLeft).getBlue());
 
-                int vRedXY2 = 0;//Math.abs(new Color(vTopRightP).getRed() - new Color(vBotLeftP).getRed());
-                int vGreenXY2 = 0;//Math.abs(new Color(vTopRightP).getGreen() - new Color(vBotLeftP).getGreen());
-                int vBlueXY2 = 0;//Math.abs(new Color(vTopRightP).getBlue() - new Color(vBotLeftP).getBlue());
+                int vRedXY2 = Math.abs(new Color(vTopRightP).getRed() - new Color(vBotLeftP).getRed());
+                int vGreenXY2 = Math.abs(new Color(vTopRightP).getGreen() - new Color(vBotLeftP).getGreen());
+                int vBlueXY2 = Math.abs(new Color(vTopRightP).getBlue() - new Color(vBotLeftP).getBlue());
 
-                int vRedYX2 = 0;//Math.abs(new Color(vBotRightP).getRed() - new Color(vTopLeftP).getRed());
-                int vGreenYX2 = 0;//Math.abs(new Color(vBotRightP).getGreen() - new Color(vTopLeftP).getGreen());
-                int vBlueYX2 = 0;//Math.abs(new Color(vBotRightP).getBlue() - new Color(vTopLeftP).getBlue());
+                int vRedYX2 = Math.abs(new Color(vBotRightP).getRed() - new Color(vTopLeftP).getRed());
+                int vGreenYX2 = Math.abs(new Color(vBotRightP).getGreen() - new Color(vTopLeftP).getGreen());
+                int vBlueYX2 = Math.abs(new Color(vBotRightP).getBlue() - new Color(vTopLeftP).getBlue());
 
-                int vRedYX3 = 0;//Math.abs(new Color(vBotMidRight).getRed() - new Color(vTopMidLeft).getRed());
-                int vGreenYX3 = 0;//Math.abs(new Color(vBotMidRight).getGreen() - new Color(vTopMidLeft).getGreen());
-                int vBlueYX3 = 0;//Math.abs(new Color(vBotMidRight).getBlue() - new Color(vTopLeftP).getBlue());
+                int vRedYX3 = Math.abs(new Color(vBotMidRight).getRed() - new Color(vTopMidLeft).getRed());
+                int vGreenYX3 = Math.abs(new Color(vBotMidRight).getGreen() - new Color(vTopMidLeft).getGreen());
+                int vBlueYX3 = Math.abs(new Color(vBotMidRight).getBlue() - new Color(vTopLeftP).getBlue());
 
-                int vRedYX4 = 0;//Math.abs(new Color(vBotMidLeft).getRed() - new Color(vTopMidRight).getRed());
-                int vGreenYX4 = 0;//Math.abs(new Color(vBotMidLeft).getGreen() - new Color(vTopMidRight).getGreen());
-                int vBlueYX4 = 0;//Math.abs(new Color(vBotMidLeft).getBlue() - new Color(vTopMidRight).getBlue());
+                int vRedYX4 = Math.abs(new Color(vBotMidLeft).getRed() - new Color(vTopMidRight).getRed());
+                int vGreenYX4 = Math.abs(new Color(vBotMidLeft).getGreen() - new Color(vTopMidRight).getGreen());
+                int vBlueYX4 = Math.abs(new Color(vBotMidLeft).getBlue() - new Color(vTopMidRight).getBlue());
 
-                int vRedYX5 = 0;//Math.abs(new Color(vLeftMidTop).getRed() - new Color(vRightMidBot).getRed());
-                int vGreenYX5 = 0;//Math.abs(new Color(vLeftMidTop).getGreen() - new Color(vRightMidBot).getGreen());
-                int vBlueYX5 = 0;//Math.abs(new Color(vLeftMidTop).getBlue() - new Color(vRightMidBot).getBlue());
+                int vRedYX5 = Math.abs(new Color(vLeftMidTop).getRed() - new Color(vRightMidBot).getRed());
+                int vGreenYX5 = Math.abs(new Color(vLeftMidTop).getGreen() - new Color(vRightMidBot).getGreen());
+                int vBlueYX5 = Math.abs(new Color(vLeftMidTop).getBlue() - new Color(vRightMidBot).getBlue());
 
-                int vRedYX6 = 0;//Math.abs(new Color(vLeftMidBot).getRed() - new Color(vRightMidTop).getRed());
-                int vGreenYX6 = 0;//Math.abs(new Color(vLeftMidBot).getGreen() - new Color(vRightMidTop).getGreen());
-                int vBlueYX6 = 0;//Math.abs(new Color(vLeftMidBot).getBlue() - new Color(vRightMidTop).getBlue());
+                int vRedYX6 = Math.abs(new Color(vLeftMidBot).getRed() - new Color(vRightMidTop).getRed());
+                int vGreenYX6 = Math.abs(new Color(vLeftMidBot).getGreen() - new Color(vRightMidTop).getGreen());
+                int vBlueYX6 = Math.abs(new Color(vLeftMidBot).getBlue() - new Color(vRightMidTop).getBlue());
                 
                 vEdgeTab[x][y] = vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY
                                + vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6
@@ -177,15 +176,15 @@ public class SeamCarving {
                                  +1*(((new Color(vBot).getRed())+(new Color(vBot).getBlue())+(new Color(vBot).getBlue()))/3)
                                  +1*(((new Color(vLeft).getRed())+(new Color(vLeft).getBlue())+(new Color(vLeft).getBlue()))/3)
                                  +1*(((new Color(vRight).getRed())+(new Color(vRight).getBlue())+(new Color(vRight).getBlue()))/3);*/
-
+                
                 vImage.setRGB(x,y,new Color((vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY)/24,
                                             (vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6)/24,
                                             (vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6)/24).getRGB());
             }
         }
 
-        File vOutputfile = new File("output/edge.png");
-        ImageIO.write(vImage, "png", vOutputfile);
+        //File vOutputfile = new File("output/edge.png");
+        //ImageIO.write(vImage, "png", vOutputfile);
         return vEdgeTab;
     }
 
@@ -281,16 +280,6 @@ public class SeamCarving {
                 }catch(Exception pE){}
             }//endfor
         }//endfor
-
-        PrintWriter vWriterColonne = new PrintWriter("mligne.txt");
-            
-            for(int j = 0; j < pEdge[0].length;j++){
-                for(int i = 0; i < pEdge.length;i++){
-                    vWriterColonne.print("" + vM[i][j] + " ");
-                }//endfor
-                vWriterColonne.println(" ");
-            }//endfor
-            vWriterColonne.close();
 
         return vM;
     }//calculerMLigne()
@@ -463,9 +452,9 @@ public class SeamCarving {
      * @return Tableau de l'image avec p colonne en moins mais matrice non redimensionné
      * @throws Exception
      */
-    static public int[][] retirerColonne(final int pColonne, final int[][] pEdge, final int [][] pImageTab) throws Exception{
+    static public int[][] retirerColonne(final int pColonne, final int [][] pImageTab) throws Exception{
         System.gc();//Force le garbage collector
-        int[][] vEdgeModifie = pEdge;
+        int[][] vEdgeModifie = detectEdge(pImageTab);
         int[][] vImageTabModifie = pImageTab;
         int vColonne = pColonne;
 
@@ -477,9 +466,9 @@ public class SeamCarving {
             }//endif
             int[][] vMColonne = calculerMColone(vEdgeModifie);
             int[] vColonneValue = minValueColonne(vMColonne,vMColonne[0].length-1);
-            vEdgeModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vEdgeModifie,vColonne,vMColonne,vColonneValue);
+            //vEdgeModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vEdgeModifie,vColonne,vMColonne,vColonneValue);
             vImageTabModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vImageTabModifie,vColonne,vMColonne,vColonneValue);
-            //vEdgeModifie = detectEdge(vImageTabModifie);
+            vEdgeModifie = detectEdge(vImageTabModifie);
             vColonne--;
         }
 
@@ -495,9 +484,9 @@ public class SeamCarving {
      * @return Tableau de l'image avec p colonne en moins mais matrice non redimensionné
      * @throws Exception
      */
-    static public int[][] retirerLigne(final int pLigne, final int[][] pEdge, final int [][] pImageTab) throws Exception{
+    static public int[][] retirerLigne(final int pLigne, final int [][] pImageTab) throws Exception{
         System.gc();//Force le garbage collector
-        int[][] vEdgeModifie = pEdge;
+        int[][] vEdgeModifie = detectEdge(pImageTab);
         int[][] vImageTabModifie = pImageTab;
         int vLigne = pLigne;
 
@@ -509,8 +498,9 @@ public class SeamCarving {
             }//endif
             int[][] vMLigne = calculerMLigne(vEdgeModifie);
             int[] vLigneValue = minValueLigne(vMLigne,vMLigne.length-1);
-            vEdgeModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vEdgeModifie,vLigne,vMLigne,vLigneValue);
+            //vEdgeModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vEdgeModifie,vLigne,vMLigne,vLigneValue);
             vImageTabModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vImageTabModifie,vLigne,vMLigne,vLigneValue);
+            vEdgeModifie = detectEdge(vImageTabModifie);
             vLigne--;
         }
 
@@ -605,28 +595,26 @@ public class SeamCarving {
 
     static public void main(final String[] args){
         try{
-            String vNameImage = "src/seamcarvingdemo.jpg";//args[0];
+            String vNameImage = args[0];
             long vStart = new Date().getTime();
             System.out.print("Processing : \n");
             
             System.out.print("Loading file.\n");
             int[][] vImageTab = createImageTab(vNameImage);
 
-            System.out.print("Calculating gradient for each pixel, vertically.\n");
-            int[][] vEdge = detectEdge(vImageTab);
+            int vPourcentageColonne =Integer.parseInt(args[1]);
+            int vPourcentageLigne =Integer.parseInt(args[2]);
 
-            int vPourcentageColonne =50;//Integer.parseInt(args[1]);
-            int vPourcentageLigne =0;//Integer.parseInt(args[2]);
             int vColonneToDelete = conversionPourcentageColonne(vImageTab, vPourcentageColonne); 
-            System.out.print("Calculating gradient for each pixel, horizontally.\n");
             int vLigneToDelete = conversionPourcentageLigne(vImageTab, vPourcentageLigne);
             
             vImageSeams = new int[vImageTab.length][vImageTab[0].length]; //Localisation des pixels des seams
 
-            System.out.print("Finding shortest paths and editing image.\n");
-            
-            int[][] vImageRedimensionnee = retirerColonne(vColonneToDelete, vEdge, vImageTab);
-            vImageRedimensionnee = retirerLigne(vLigneToDelete, detectEdge(vImageRedimensionnee), vImageRedimensionnee); //On recupere limage avec les colonnes en moins et on retire les lignes
+            System.out.print("Editing image vertically.\n");
+            int[][] vImageRedimensionnee = retirerColonne(vColonneToDelete, vImageTab);
+
+            System.out.print("Editing image horizontally.\n");
+            vImageRedimensionnee = retirerLigne(vLigneToDelete, vImageRedimensionnee); //On recupere limage avec les colonnes en moins et on retire les lignes
 
             System.out.print("Saving file.\n");
             createFile(vImageRedimensionnee,"output/final");

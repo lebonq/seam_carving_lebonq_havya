@@ -1,6 +1,11 @@
 //Bonjour et bienvenue dans ce programme d'algorthmique sur les coccinelles.
 public class Coccinelle{
     
+    /**
+     * Permet de calculer tout les chemins de cout les plus bas
+     * @param pM notre matrice de départ
+     * @return tableau 2d qui contient la matrice des chemins de cout les plus bas
+     */
     static int[][]calculerM(final int[][] pM){ 
         int vCMax = pM[0].length;
         int vLMax = pM.length;
@@ -52,8 +57,12 @@ public class Coccinelle{
         return M;
     }//calculerM()
 
+    /**
+     * Permet d'afficher un tableau 2D
+     * @param pM le tableau à afficher
+     */
     static void afficherM(final int[][] pM){
-        System.out.println("Tableau M[L][C] de terme general M[l][c] = m(l,c) :");
+        System.out.println("Tableau M[L][C] de terme général M[l][c] = m(l,c) :");
         for(int i = 7; i >= 0;i--){
             for(int j = 0; j < 5;j++){
                 if(pM[i][j] < 100) { //Ces deux conditions permetttent l'alignement des valeurs
@@ -69,10 +78,14 @@ public class Coccinelle{
         System.out.println("");
     }//afficherM()
 
+    /**
+     * procédure qui nous permet d'afficher les résultats de notre matrice
+     * @param pM Notre matrice avec kes chemins aux couts les plus bas
+     */
     static void afficherResultat(final int[][] pM){
         int vCMax = pM[0].length;
         int vLMax = pM.length;
-        int vIndiceMax = afficherValeurMax(pM,vCMax);
+        int vIndiceMax = afficherValeurMax(pM,vCMax,vLMax);
         System.out.print("Elle a suivi le chemin : ");
         int[] vDebutFin = accm(pM,vLMax-1,vIndiceMax);
         System.out.printf("\nCase d'atterrissage = (%d,%d) \n",vDebutFin[0],vDebutFin[1]);
@@ -80,13 +93,20 @@ public class Coccinelle{
 
     }//afficherResultat()
 
-    static int afficherValeurMax(final int[][] pM,final int pCMax){
+    /**
+     * Permet d'afficher le nombre max de puceron ainsi que de calculer son indice
+     * @param pM Notre matrice M avec les chemins de couts minimin
+     * @param pCMax Nombre de colonne
+     * @param pLMax nombre de ligne
+     * @return int l'indice de position de la valeur maximal 
+     */
+    static int afficherValeurMax(final int[][] pM,final int pCMax, final int pLMax){
         int vRes = pM[pM.length-1][0];
         int vIndice = 0;
         for(int i=0; i<pCMax-1;i++){    
-            if(vRes < pM[7][i + 1]){
+            if(vRes < pM[pLMax][i + 1]){
                 vIndice = i+1;
-                vRes = pM[7][i + 1];
+                vRes = pM[pLMax][i + 1];
             }//endif
         }//endfor
         System.out.println("La coccinelle a mange " + vRes + " pucerons.");
@@ -94,8 +114,12 @@ public class Coccinelle{
     }//afficherValeurMax()
 
     /**
-     * Retourne un tableau 2d ou a l'indice 0 : tableau contenant les coordonees de la case d'interview
-     *                             l'indice 1 : tableau contenant les coordonees de la case d'atterrissage
+     * Permet d'afficher le chemin de cout minimun et de calculer la case de depart
+     * @param pM Tableau avec chemins aux couts les plus bas
+     * @param pI Ligne ou on est actuellement
+     * @param pJ Colonne ou on est actuellement
+     * @return Retourne un tableau ou a l'indice 0 : tableau contenant la ligne de la case d'interview
+     *                          l'indice 1 : tableau contenant la colonne de la case d'atterrissage
      */
     static int[] accm(final int[][] pM,final int pI,final int pJ){ 
         int vJMoinsUn = 0;
@@ -142,5 +166,3 @@ public class Coccinelle{
             afficherResultat(vM);
     }//main()
 }//Class cocinelle
-
-//Je vais me prendre un cafe
