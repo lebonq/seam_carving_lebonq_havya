@@ -41,7 +41,7 @@ public class SeamCarving {
      * @return pEdge int[][] Un tableau 2D avec la valeur de nos energies
      * @throws Exception
      */
-    static public int[][] detectEdge(final int[][] pImage) throws Exception{
+    static public int[][] detectEdge(final int[][] pImage,final boolean pWriteFile) throws Exception{
         int vImageWidth = pImage.length;
         int vImageHeight = pImage[0].length;
         BufferedImage vImage = new BufferedImage(vImageWidth,vImageHeight,TYPE_INT_RGB);
@@ -183,8 +183,10 @@ public class SeamCarving {
             }
         }
 
-        //File vOutputfile = new File("output/edge.png");
-        //ImageIO.write(vImage, "png", vOutputfile);
+        if(pWriteFile){
+            File vOutputfile = new File("edge.png");
+            ImageIO.write(vImage, "png", vOutputfile);
+        }
         return vEdgeTab;
     }
 
@@ -454,7 +456,7 @@ public class SeamCarving {
      */
     static public int[][] retirerColonne(final int pColonne, final int [][] pImageTab) throws Exception{
         System.gc();//Force le garbage collector
-        int[][] vEdgeModifie = detectEdge(pImageTab);
+        int[][] vEdgeModifie = detectEdge(pImageTab,true);
         int[][] vImageTabModifie = pImageTab;
         int vColonne = pColonne;
 
@@ -468,7 +470,7 @@ public class SeamCarving {
             int[] vColonneValue = minValueColonne(vMColonne,vMColonne[0].length-1);
             //vEdgeModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vEdgeModifie,vColonne,vMColonne,vColonneValue);
             vImageTabModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vImageTabModifie,vColonne,vMColonne,vColonneValue);
-            vEdgeModifie = detectEdge(vImageTabModifie);
+            vEdgeModifie = detectEdge(vImageTabModifie,false);
             vColonne--;
         }
 
@@ -486,7 +488,7 @@ public class SeamCarving {
      */
     static public int[][] retirerLigne(final int pLigne, final int [][] pImageTab) throws Exception{
         System.gc();//Force le garbage collector
-        int[][] vEdgeModifie = detectEdge(pImageTab);
+        int[][] vEdgeModifie = detectEdge(pImageTab,false);
         int[][] vImageTabModifie = pImageTab;
         int vLigne = pLigne;
 
@@ -500,7 +502,7 @@ public class SeamCarving {
             int[] vLigneValue = minValueLigne(vMLigne,vMLigne.length-1);
             //vEdgeModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vEdgeModifie,vLigne,vMLigne,vLigneValue);
             vImageTabModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vImageTabModifie,vLigne,vMLigne,vLigneValue);
-            vEdgeModifie = detectEdge(vImageTabModifie);
+            vEdgeModifie = detectEdge(vImageTabModifie,false);
             vLigne--;
         }
 
@@ -514,15 +516,15 @@ public class SeamCarving {
         
         //decommenter les lignes suivantes pour creer tracer les seams
         /*
-        Stack<int[]> vStack = ccm(pMColonne, pColonneValue);
+        Stack<int[]> vStackColonne = ccmColonne(pMColonne, pColonneValue);
         vImageSeams = pImageTab;
         for(int y = 0; y < vImageSeams[0].length; y++) {
-            int[] test = vStack.pop();
+            int[] test = vStackColonne.pop();
             for(int x = 0; x < vImageSeams.length;x++){
                 vImageSeams[test[0]][test[1]] = new Color(255,0,0).getRGB();
             }
-        }*/
-        //createFile(vImageSeams, "animation/" + Math.abs(pColonne-1142));
+        }
+        createFile(vImageSeams, "animation/" + Math.abs(pColonne-714));*/
 
         for(int y = 0; y < vImageReturn[0].length; y++) {
             for(int x = 0; x < vImageReturn.length;x++){
@@ -545,15 +547,15 @@ public class SeamCarving {
         
         //decommenter les lignes suivantes pour creer l'animation
         /*
-        Stack<int[]> vStack = ccm(pMColonne, pColonneValue);
+        Stack<int[]> vStackLigne = ccmLigne(pMLigne, pLigneValue);
         vImageSeams = pImageTab;
-        for(int y = 0; y < vImageSeams[0].length; y++) {
-            int[] test = vStack.pop();
-            for(int x = 0; x < vImageSeams.length;x++){
+        for(int x = 0; x < vImageSeams.length; x++) {
+            int[] test = vStackLigne.pop();
+            for(int y = 0; y < vImageSeams[0].length;y++){
                 vImageSeams[test[0]][test[1]] = new Color(255,0,0).getRGB();
             }
         }
-        createFile(vImageSeams, "animation/" + Math.abs(pColonne-1142));*/
+        createFile(vImageSeams, "animation/" + (Math.abs((pLigne-484))+714));*/
 
         for(int y = 0; y < vImageReturn[0].length; y++) {
             for(int x = 0; x < vImageReturn.length;x++){
@@ -617,7 +619,7 @@ public class SeamCarving {
             vImageRedimensionnee = retirerLigne(vLigneToDelete, vImageRedimensionnee); //On recupere limage avec les colonnes en moins et on retire les lignes
 
             System.out.print("Saving file.\n");
-            createFile(vImageRedimensionnee,"output/final");
+            createFile(vImageRedimensionnee,"final");
 
             System.out.println("\nDone !\n");
 
