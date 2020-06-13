@@ -41,15 +41,14 @@ public class SeamCarving {
      * @return pEdge int[][] Un tableau 2D avec la valeur de nos energies
      * @throws Exception
      */
-    static public int[][] detectEdge(final int[][] pImage,final boolean pWriteFile) throws Exception{
+    static public int[][] detectEdge(final int[][] pImage,final boolean pWriteFile,final String pNameImage) throws Exception{
         int vImageWidth = pImage.length;
         int vImageHeight = pImage[0].length;
-        BufferedImage vImage = new BufferedImage(vImageWidth,vImageHeight,TYPE_INT_RGB);
+        BufferedImage vImage = new BufferedImage(vImageWidth,vImageHeight,TYPE_INT_RGB);// On cree notre objet image avec 3 canaux : R G et B
         int[][] vEdgeTab = new int[vImageWidth][vImageHeight];
 
         for(int y = 0; y < vImageHeight; y++) { // On ajoute les valeurs pour avoir les couts de chaque pixel
             for (int x = 0; x < vImageWidth; x++) {
-                int vCurrent = pImage[x][y];
                 int vTop = pImage[x][y];
                 int vBot = pImage[x][y];
                 int vLeft = pImage[x][y];
@@ -77,43 +76,43 @@ public class SeamCarving {
 
                 try{
                 vTop = pImage[x][y-1];
-                vTopP = pImage[x][y-2];
-                }catch(Exception pE){}
-                try{
-                vBot = pImage[x][y+1];
-                vBotP = pImage[x][y+2];
-                }catch(Exception pE){}
-                try{
-                vRight = pImage[x+1][y];
-                vRightP = pImage[x+2][y];
-                }catch(Exception pE){}
-                try{
-                vLeft = pImage[x-1][y];
-                vLeftP = pImage[x-2][y];
-                }catch(Exception pE){}
-                try{
                 vTopRight = pImage[x+1][y-1];
-                vTopRightP = pImage[x+2][y-2];
-                vTopMidRight = pImage[x+1][y-2];
                 vRightMidTop = pImage[x+2][y-1];
-                }catch(Exception pE){}
-                try{
                 vTopLeft = pImage[x-1][y-1];
-                vTopLeftP = pImage[x-2][y-2];
-                vTopMidLeft = pImage[x-1][y-2];
                 vLeftMidTop = pImage[x-2][y-1];
                 }catch(Exception pE){}
                 try{
+                vBot = pImage[x][y+1];
                 vBotRight = pImage[x+1][y+1];
-                vBotRightP = pImage[x+2][y+2];
-                vBotMidRight = pImage[x+1][y+2];
                 vRightMidBot = pImage[x+2][y+1];
+                vLeftMidBot = pImage[x-2][y+1];
+                vBotLeft = pImage[x-1][y+1];
                 }catch(Exception pE){}
                 try{
-                vBotLeft = pImage[x-1][y+1];
-                vBotLeftP = pImage[x-2][y+2];
-                vBotMidLeft = pImage[x-1][y+2];
-                vLeftMidBot = pImage[x-2][y+1];
+                vTopLeftP = pImage[x-2][y-2];
+                vTopMidLeft = pImage[x-1][y-2];
+                vTopRightP = pImage[x+2][y-2];
+                vTopP = pImage[x][y-2];
+                vTopMidRight = pImage[x+1][y-2];
+                }catch(Exception pE){}
+                try{
+                    vBotP = pImage[x][y+2];
+                    vBotRightP = pImage[x+2][y+2];
+                    vBotMidRight = pImage[x+1][y+2];
+                    vBotLeftP = pImage[x-2][y+2];
+                    vBotMidLeft = pImage[x-1][y+2];
+                    }catch(Exception pE){}
+                try{
+                    vRight = pImage[x+1][y];
+                }catch(Exception pE){}
+                try{
+                    vLeft = pImage[x-1][y];
+                }catch(Exception pE){}
+                try{               
+                    vLeftP = pImage[x-2][y];
+                }catch(Exception pE){}
+                try{
+                    vRightP = pImage[x+2][y];
                 }catch(Exception pE){}
                 
                 int vRedX = Math.abs(new Color(vRight).getRed() - new Color(vLeft).getRed());
@@ -167,16 +166,7 @@ public class SeamCarving {
                 vEdgeTab[x][y] = vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY
                                + vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6
                                + vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6;
-                
-
-                // Filtre Laplacien
-                /*
-                vEdgeTab[x][y] = -4*(((new Color(vCurrent).getRed())+(new Color(vCurrent).getBlue())+(new Color(vCurrent).getBlue()))/3)
-                                 +1*(((new Color(vTop).getRed())+(new Color(vTop).getBlue())+(new Color(vTop).getBlue()))/3)
-                                 +1*(((new Color(vBot).getRed())+(new Color(vBot).getBlue())+(new Color(vBot).getBlue()))/3)
-                                 +1*(((new Color(vLeft).getRed())+(new Color(vLeft).getBlue())+(new Color(vLeft).getBlue()))/3)
-                                 +1*(((new Color(vRight).getRed())+(new Color(vRight).getBlue())+(new Color(vRight).getBlue()))/3);*/
-                
+                               
                 vImage.setRGB(x,y,new Color((vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY)/24,
                                             (vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6)/24,
                                             (vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6)/24).getRGB());
@@ -184,7 +174,7 @@ public class SeamCarving {
         }
 
         if(pWriteFile){
-            File vOutputfile = new File("edge.png");
+            File vOutputfile = new File(pNameImage + "_edge.png");
             ImageIO.write(vImage, "png", vOutputfile);
         }
         return vEdgeTab;
@@ -350,7 +340,7 @@ public class SeamCarving {
      * @param pValMin tableau retourné par minValue()
      * @return Stack<int[]> avec en 0 la coordonée x et en 1 y
      */
-    static public Stack<int[]> ccmColonne(final int[][] pM,final int[] pValMin){
+    static public Stack<int[]> ccmColonne(final int[][] pM,final int[] pValMin) throws Exception{
         int vXDepart = pValMin[1];
         int vYDepart = pValMin[2];
         int Infini = Integer.MAX_VALUE;
@@ -393,7 +383,7 @@ public class SeamCarving {
      * @param pValMin tableau retourné par minValue()
      * @return Stack<int[]> avec en 0 la coordonée x et en 1 y
      */
-    static public Stack<int[]> ccmLigne(final int[][] pM,final int[] pValMin){
+    static public Stack<int[]> ccmLigne(final int[][] pM,final int[] pValMin) throws Exception{
         int vXDepart = pValMin[1];
         int vYDepart = pValMin[2];
         int Infini = Integer.MAX_VALUE;
@@ -456,7 +446,7 @@ public class SeamCarving {
      */
     static public int[][] retirerColonne(final int pColonne, final int [][] pImageTab) throws Exception{
         System.gc();//Force le garbage collector
-        int[][] vEdgeModifie = detectEdge(pImageTab,true);
+        int[][] vEdgeModifie = detectEdge(pImageTab,false,"");
         int[][] vImageTabModifie = pImageTab;
         int vColonne = pColonne;
 
@@ -470,7 +460,7 @@ public class SeamCarving {
             int[] vColonneValue = minValueColonne(vMColonne,vMColonne[0].length-1);
             //vEdgeModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vEdgeModifie,vColonne,vMColonne,vColonneValue);
             vImageTabModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vImageTabModifie,vColonne,vMColonne,vColonneValue);
-            vEdgeModifie = detectEdge(vImageTabModifie,false);
+            vEdgeModifie = detectEdge(vImageTabModifie,false,"");
             vColonne--;
         }
 
@@ -488,7 +478,7 @@ public class SeamCarving {
      */
     static public int[][] retirerLigne(final int pLigne, final int [][] pImageTab) throws Exception{
         System.gc();//Force le garbage collector
-        int[][] vEdgeModifie = detectEdge(pImageTab,false);
+        int[][] vEdgeModifie = detectEdge(pImageTab,false,"");
         int[][] vImageTabModifie = pImageTab;
         int vLigne = pLigne;
 
@@ -502,7 +492,7 @@ public class SeamCarving {
             int[] vLigneValue = minValueLigne(vMLigne,vMLigne.length-1);
             //vEdgeModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vEdgeModifie,vLigne,vMLigne,vLigneValue);
             vImageTabModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vImageTabModifie,vLigne,vMLigne,vLigneValue);
-            vEdgeModifie = detectEdge(vImageTabModifie,false);
+            vEdgeModifie = detectEdge(vImageTabModifie,false,"");
             vLigne--;
         }
 
@@ -515,6 +505,7 @@ public class SeamCarving {
         int[][] vImageReturn = new int[pImageTab.length-1][pImageTab[0].length];
         
         //decommenter les lignes suivantes pour creer tracer les seams
+        //Il faut adapter les valeurs manuellement
         /*
         Stack<int[]> vStackColonne = ccmColonne(pMColonne, pColonneValue);
         vImageSeams = pImageTab;
@@ -546,6 +537,7 @@ public class SeamCarving {
         int[][] vImageReturn = new int[pImageTab.length][pImageTab[0].length-1];
         
         //decommenter les lignes suivantes pour creer l'animation
+        //Il faut adapter les valeurs manuellement
         /*
         Stack<int[]> vStackLigne = ccmLigne(pMLigne, pLigneValue);
         vImageSeams = pImageTab;
@@ -597,15 +589,16 @@ public class SeamCarving {
 
     static public void main(final String[] args){
         try{
-            String vNameImage = args[0];
+            String vNameImage = "" + args[0] + ".png";
             long vStart = new Date().getTime();
             System.out.print("Processing : \n");
             
             System.out.print("Loading file.\n");
             int[][] vImageTab = createImageTab(vNameImage);
-
-            int vPourcentageColonne =Integer.parseInt(args[1]);
-            int vPourcentageLigne =Integer.parseInt(args[2]);
+            detectEdge(vImageTab,true,args[0]);
+            
+            int vPourcentageColonne =Integer.parseInt(args[2]);
+            int vPourcentageLigne =Integer.parseInt(args[1]);
 
             int vColonneToDelete = conversionPourcentageColonne(vImageTab, vPourcentageColonne); 
             int vLigneToDelete = conversionPourcentageLigne(vImageTab, vPourcentageLigne);
@@ -619,7 +612,7 @@ public class SeamCarving {
             vImageRedimensionnee = retirerLigne(vLigneToDelete, vImageRedimensionnee); //On recupere limage avec les colonnes en moins et on retire les lignes
 
             System.out.print("Saving file.\n");
-            createFile(vImageRedimensionnee,"final");
+            createFile(vImageRedimensionnee,args[0] + "_resized_" + vPourcentageLigne + "_" + vPourcentageColonne);
 
             System.out.println("\nDone !\n");
 

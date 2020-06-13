@@ -103,10 +103,10 @@ public class Coccinelle{
     static int afficherValeurMax(final int[][] pM,final int pCMax, final int pLMax){
         int vRes = pM[pM.length-1][0];
         int vIndice = 0;
-        for(int i=0; i<pCMax-1;i++){    
-            if(vRes < pM[pLMax][i + 1]){
+        for(int i=0; i<pCMax-1;i++){ 
+            if(vRes < pM[pLMax-1][i + 1]){
                 vIndice = i+1;
-                vRes = pM[pLMax][i + 1];
+                vRes = pM[pLMax-1][i + 1];
             }//endif
         }//endfor
         System.out.println("La coccinelle a mange " + vRes + " pucerons.");
