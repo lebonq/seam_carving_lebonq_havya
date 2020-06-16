@@ -9,9 +9,9 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class SeamCarving {
-    static public long vTimeColonneStart = new Date().getTime();
+    static public long vTimeColonneStart = new Date().getTime(); //Initialise le timer pour l'estimation du temps
     static public long vTimeLigneStart = new Date().getTime();
-    static public int[][] vImageSeams;
+    static public int[][] vImageSeams; //Permet de faire l'animation
 
     /**
      * Permet de copier l'image pixel par pixel dans un tableau 2D
@@ -75,25 +75,25 @@ public class SeamCarving {
                 int vRightMidBot = pImage[x][y];
 
                 try{
-                vTop = pImage[x][y-1];
-                vTopRight = pImage[x+1][y-1];
-                vRightMidTop = pImage[x+2][y-1];
-                vTopLeft = pImage[x-1][y-1];
-                vLeftMidTop = pImage[x-2][y-1];
+                    vTop = pImage[x][y-1];
+                    vTopRight = pImage[x+1][y-1];
+                    vRightMidTop = pImage[x+2][y-1];
+                    vTopLeft = pImage[x-1][y-1];
+                    vLeftMidTop = pImage[x-2][y-1];
                 }catch(Exception pE){}
                 try{
-                vBot = pImage[x][y+1];
-                vBotRight = pImage[x+1][y+1];
-                vRightMidBot = pImage[x+2][y+1];
-                vLeftMidBot = pImage[x-2][y+1];
-                vBotLeft = pImage[x-1][y+1];
+                    vBot = pImage[x][y+1];
+                    vBotRight = pImage[x+1][y+1];
+                    vRightMidBot = pImage[x+2][y+1];
+                    vLeftMidBot = pImage[x-2][y+1];
+                    vBotLeft = pImage[x-1][y+1];
                 }catch(Exception pE){}
                 try{
-                vTopLeftP = pImage[x-2][y-2];
-                vTopMidLeft = pImage[x-1][y-2];
-                vTopRightP = pImage[x+2][y-2];
-                vTopP = pImage[x][y-2];
-                vTopMidRight = pImage[x+1][y-2];
+                    vTopLeftP = pImage[x-2][y-2];
+                    vTopMidLeft = pImage[x-1][y-2];
+                    vTopRightP = pImage[x+2][y-2];
+                    vTopP = pImage[x][y-2];
+                    vTopMidRight = pImage[x+1][y-2];
                 }catch(Exception pE){}
                 try{
                     vBotP = pImage[x][y+2];
@@ -101,7 +101,7 @@ public class SeamCarving {
                     vBotMidRight = pImage[x+1][y+2];
                     vBotLeftP = pImage[x-2][y+2];
                     vBotMidLeft = pImage[x-1][y+2];
-                    }catch(Exception pE){}
+                }catch(Exception pE){}
                 try{
                     vRight = pImage[x+1][y];
                 }catch(Exception pE){}
@@ -167,9 +167,9 @@ public class SeamCarving {
                                + vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6
                                + vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6;
                                
-                vImage.setRGB(x,y,new Color((vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY)/24,
-                                            (vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6)/24,
-                                            (vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6)/24).getRGB());
+                vImage.setRGB(x,y,new Color((vRedX+vRedY+vRedX2+vRedY2+vRedYX+vRedXY2+vRedYX2+vRedYX3+vRedYX4+vRedYX5+vRedYX6+vRedXY)/12,
+                                            (vGreenX+vGreenY+vGreenX2+vGreenY2+vGreenXY+vGreenYX+vGreenXY2+vGreenYX2+vGreenYX3+vGreenYX4+vGreenYX5+vGreenYX6)/12,
+                                            (vBlueX+vBlueY+vBlueX2+vBlueY2+vBlueXY+vBlueYX+vBlueXY2+vBlueYX2+vBlueYX3+vBlueYX4+vBlueYX5+vBlueYX6)/12).getRGB());
             }
         }
 
@@ -458,7 +458,6 @@ public class SeamCarving {
             }//endif
             int[][] vMColonne = calculerMColone(vEdgeModifie);
             int[] vColonneValue = minValueColonne(vMColonne,vMColonne[0].length-1);
-            //vEdgeModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vEdgeModifie,vColonne,vMColonne,vColonneValue);
             vImageTabModifie = decalerLigne(ccmColonne(vMColonne, vColonneValue),vImageTabModifie,vColonne,vMColonne,vColonneValue);
             vEdgeModifie = detectEdge(vImageTabModifie,false,"");
             vColonne--;
@@ -490,7 +489,6 @@ public class SeamCarving {
             }//endif
             int[][] vMLigne = calculerMLigne(vEdgeModifie);
             int[] vLigneValue = minValueLigne(vMLigne,vMLigne.length-1);
-            //vEdgeModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vEdgeModifie,vLigne,vMLigne,vLigneValue);
             vImageTabModifie = decalerColonne(ccmLigne(vMLigne, vLigneValue),vImageTabModifie,vLigne,vMLigne,vLigneValue);
             vEdgeModifie = detectEdge(vImageTabModifie,false,"");
             vLigne--;
@@ -589,13 +587,13 @@ public class SeamCarving {
 
     static public void main(final String[] args){
         try{
-            String vNameImage = "" + args[0] + ".png";
+            String vNameImage = "" + args[0];
             long vStart = new Date().getTime();
             System.out.print("Processing : \n");
             
             System.out.print("Loading file.\n");
             int[][] vImageTab = createImageTab(vNameImage);
-            detectEdge(vImageTab,true,args[0]);
+            detectEdge(vImageTab,true,args[0].split(".png",2)[0]);
             
             int vPourcentageColonne =Integer.parseInt(args[2]);
             int vPourcentageLigne =Integer.parseInt(args[1]);
@@ -612,7 +610,7 @@ public class SeamCarving {
             vImageRedimensionnee = retirerLigne(vLigneToDelete, vImageRedimensionnee); //On recupere limage avec les colonnes en moins et on retire les lignes
 
             System.out.print("Saving file.\n");
-            createFile(vImageRedimensionnee,args[0] + "_resized_" + vPourcentageLigne + "_" + vPourcentageColonne);
+            createFile(vImageRedimensionnee,args[0].split(".png",2)[0] + "_resized_" + vPourcentageLigne + "_" + vPourcentageColonne);
 
             System.out.println("\nDone !\n");
 
